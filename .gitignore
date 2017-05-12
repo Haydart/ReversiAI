@@ -1,0 +1,8 @@
+.DS_Store
+/ideaSDK
+/android-studio/sdk
+/out
+workspace.xml
+.gradle/
+build/
+!**/src/**/build
