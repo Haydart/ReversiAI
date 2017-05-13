@@ -7,8 +7,9 @@ import javax.swing.border.BevelBorder
 /**
  * Created by r.makowiecki on 12/05/2017.
  */
-class Cell(background: Color, initialSize: Int) : JButton() {
+class Cell(background: Color, initialSize: Int, index: Int) : JButton() {
     private val initialSize = initialSize
+    private val index = index
 
     init {
         isContentAreaFilled = true

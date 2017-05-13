@@ -38,7 +38,7 @@ class CellGrid(initialCellSize : Int, mapComps: Map<Point, Component>) {
         }
 
         val rowCount = mapRows.size
-        val colCount = mapCols.size
+        val columnCount = mapCols.size
 
         cellWidth = 0
         cellHeight = 0
@@ -53,8 +53,7 @@ class CellGrid(initialCellSize : Int, mapComps: Map<Point, Component>) {
 
         val cellSize = Math.max(cellHeight, cellWidth)
 
-        preferredSize = Dimension(cellSize * colCount, cellSize * rowCount)
-        println(preferredSize)
+        preferredSize = Dimension(cellSize * columnCount, cellSize * rowCount)
     }
 
     val rowCount: Int
