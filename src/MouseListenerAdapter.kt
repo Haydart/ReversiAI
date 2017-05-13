@@ -4,7 +4,7 @@ import java.awt.event.MouseListener
 /**
  * Created by r.makowiecki on 13/05/2017.
  */
-open class MouseListenerAdapter : MouseListener {
+open class MouseListenerAdapter() : MouseListener {
     override fun mouseEntered(e: MouseEvent?) {
         //no-op
     }
