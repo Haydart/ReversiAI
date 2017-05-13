@@ -1,3 +1,6 @@
+package ui
+
+import logic.FieldState
 import java.awt.Color
 import java.awt.Dimension
 import javax.swing.BorderFactory
@@ -7,10 +10,10 @@ import javax.swing.border.BevelBorder
 /**
  * Created by r.makowiecki on 12/05/2017.
  */
-class Cell(background: Color, initialSize: Int, index: Int) : JButton() {
+class UiCell(background: Color, initialSize: Int, index: Int) : JButton() {
     private val initialSize = initialSize
     val index : Int = index
-    private var fieldType : FieldType = FieldType.EMPTY
+    var fieldType : FieldState = FieldState.EMPTY
 
     init {
         isContentAreaFilled = true

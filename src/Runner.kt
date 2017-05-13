@@ -1,3 +1,5 @@
+import logic.GameManager
+
 /**
  * Created by r.makowiecki on 12/05/2017.
  */
