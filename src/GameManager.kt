@@ -7,8 +7,8 @@ import javax.swing.UIManager
  * Created by r.makowiecki on 12/05/2017.
  */
 class GameManager : FieldClickListener {
-    private val preferredCellSize = 64
-    private val cellColor = Color(0, 147, 6)
+    private val preferredCellSize = 80
+    private val cellColor = Color(61, 168, 3)
     var playerTurn: PlayerTurn = PlayerTurn.BLACK
         private set
 
@@ -32,11 +32,16 @@ class GameManager : FieldClickListener {
         }
     }
 
-    override fun onFieldClicked(index: Int): Color {
+    override fun onFieldClicked(index: Int): FieldType {
         when (playerTurn) {
-            PlayerTurn.BLACK -> playerTurn = PlayerTurn.WHITE
-            PlayerTurn.WHITE -> playerTurn = PlayerTurn.BLACK
+            PlayerTurn.BLACK ->  {
+                playerTurn = PlayerTurn.WHITE
+                return FieldType.BLACK
+            }
+            PlayerTurn.WHITE -> {
+                playerTurn = PlayerTurn.BLACK
+                return FieldType.WHITE
+            }
         }
-        return playerTurn.getFieldBackgroundColor()
     }
 }

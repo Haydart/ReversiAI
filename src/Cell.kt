@@ -10,13 +10,14 @@ import javax.swing.border.BevelBorder
 class Cell(background: Color, initialSize: Int, index: Int) : JButton() {
     private val initialSize = initialSize
     val index : Int = index
+    private var fieldType : FieldType = FieldType.EMPTY
 
     init {
         isContentAreaFilled = true
         isBorderPainted = true
         isOpaque = true
         setBackground(background)
-        border = BorderFactory.createBevelBorder(BevelBorder.RAISED)
+        border = BorderFactory.createBevelBorder(BevelBorder.LOWERED)
     }
 
     override fun getPreferredSize(): Dimension = Dimension(initialSize, initialSize)
