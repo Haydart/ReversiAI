@@ -32,8 +32,6 @@ class LegalMoveFinder {
 
     private fun shouldSearch(board: GameBoard, seed: Point, direction: Direction): Boolean {
         val nextPoint = direction.next(seed)
-        val state1 = board.getSquareState(nextPoint)
-        val state2 = board.getSquareState(seed).opposite()
-        return state1 == state2
+        return board.getSquareState(nextPoint) == board.getSquareState(seed).opposite()
     }
 }

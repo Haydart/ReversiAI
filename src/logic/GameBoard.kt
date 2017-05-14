@@ -31,6 +31,7 @@ class GameBoard {
             print(
                     if(boardStateArray[index].fieldState == FieldState.BLACK) "x "
                     else if (boardStateArray[index].fieldState == FieldState.WHITE) "o "
+                    else if (boardStateArray[index].fieldState == FieldState.POSSIBLE) "* "
                     else "- "
             )
         }

@@ -21,7 +21,7 @@ class GameManager : FieldClickListener {
     private val board = GameBoard()
     private val gameBoardPanel = GameBoardPanel(cellColor, preferredCellSize, this)
     private val moveFinder = LegalMoveFinder()
-    private var validMovesIndices: Set<Int> = emptySet()
+    private var possibleMoves: Set<Int> = setOf(34, 29, 20, 43)
 
     fun startReversiGame() {
         launchGui()
@@ -38,8 +38,7 @@ class GameManager : FieldClickListener {
             findButton.addMouseListener(object : MouseListenerAdapter() {
                 override fun mouseClicked(e: MouseEvent?) {
                     super.mouseClicked(e)
-                    validMovesIndices = moveFinder.findLegalMoves(board, FieldState.BLACK)
-                    gameBoardPanel.showPossibleMoves(validMovesIndices)
+                    gameBoardPanel.showPossibleMoves(possibleMoves)
                 }
             })
             val resetButton = JButton("Reset board")
@@ -60,25 +59,29 @@ class GameManager : FieldClickListener {
         gameBoardPanel.drawBoard(board)
     }
 
-    override fun onFieldClicked(index: Int, fieldState: FieldState): FieldState {
-        if(validMovesIndices.contains(index)) {
+    override fun onFieldClicked(index: Int, oldFieldState: FieldState): FieldState {
+        if (possibleMoves.contains(index)) {
             when (playerTurn) {
                 PlayerTurn.BLACK -> {
                     playerTurn = PlayerTurn.WHITE
                     board.boardStateArray[index].fieldState = FieldState.BLACK
+                    gameBoardPanel.hidePossibleMoves(possibleMoves)
+                    possibleMoves = moveFinder.findLegalMoves(board, FieldState.BLACK)
+                    gameBoardPanel.drawField(index, FieldState.BLACK)
                     board.printBoard()
-                    gameBoardPanel.hidePossibleMoves()
                     return FieldState.BLACK
                 }
                 PlayerTurn.WHITE -> {
                     playerTurn = PlayerTurn.BLACK
                     board.boardStateArray[index].fieldState = FieldState.WHITE
+                    gameBoardPanel.hidePossibleMoves(possibleMoves)
+                    possibleMoves = moveFinder.findLegalMoves(board, FieldState.BLACK)
+                    gameBoardPanel.drawField(index, FieldState.WHITE)
                     board.printBoard()
-                    gameBoardPanel.hidePossibleMoves()
                     return FieldState.WHITE
                 }
             }
         }
-        return fieldState
+        return oldFieldState
     }
 }

@@ -14,7 +14,6 @@ import javax.swing.JPanel
 class GameBoardPanel(cellColor: Color, initialCellSize: Int, fieldClickListener: FieldClickListener) : JPanel() {
     private val imageProvider = FieldTypeImageProvider(initialCellSize)
     private var uiCellArray = Array<UiCell?>(64, { null })
-    private var possibleMoveIndices = emptySet<Int>()
 
     init {
         layout = ChessBoardLayoutManager(initialCellSize)
@@ -25,12 +24,9 @@ class GameBoardPanel(cellColor: Color, initialCellSize: Int, fieldClickListener:
                 override fun mouseClicked(e: MouseEvent?) {
                     super.mouseClicked(e)
                     println("Clicked field $index")
-
-                    if(field.fieldState == FieldState.POSSIBLE) {
-                        val newFieldState = fieldClickListener.onFieldClicked(field.index, field.fieldState)
-                        field.fieldState = newFieldState
-                        drawField(field.index, newFieldState)
-                    }
+                    val newFieldState = fieldClickListener.onFieldClicked(field.index, field.fieldState)
+                    field.fieldState = newFieldState
+                    drawField(field.index, newFieldState)
                 }
             })
             uiCellArray[index] = field
@@ -39,26 +35,25 @@ class GameBoardPanel(cellColor: Color, initialCellSize: Int, fieldClickListener:
     }
 
     fun drawBoard(board: GameBoard) {
-        for(index in board.boardStateArray.indices) {
+        for (index in board.boardStateArray.indices) {
             drawField(index, board.boardStateArray[index].fieldState)
         }
     }
 
-    private fun drawField(index: Int, fieldType: FieldState) {
+    fun drawField(index: Int, fieldType: FieldState) {
         uiCellArray[index]!!.icon = imageProvider.getImageForFieldType(fieldType)
     }
 
-    fun showPossibleMoves(validMovesIndices: Set<Int>) {
-        possibleMoveIndices = validMovesIndices
-        for (index in validMovesIndices) {
+    fun showPossibleMoves(possibleMoves: Set<Int>) {
+        for (index in possibleMoves) {
             val field = uiCellArray[index]
             field!!.fieldState = FieldState.POSSIBLE
             field.icon = imageProvider.getImageForFieldType(field.fieldState)
         }
     }
 
-    fun hidePossibleMoves() {
-        for (index in possibleMoveIndices) {
+    fun hidePossibleMoves(possibleMoves: Set<Int>) {
+        for (index in possibleMoves) {
             uiCellArray[index]!!.icon = imageProvider.getImageForFieldType(FieldState.EMPTY)
         }
     }
