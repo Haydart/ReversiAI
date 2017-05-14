@@ -21,7 +21,7 @@ class GameManager : FieldClickListener {
     private val board = GameBoard()
     private val gameBoardPanel = GameBoardPanel(cellColor, preferredCellSize, this)
     private val moveFinder = LegalMoveFinder()
-    private var validMoves: Set<Point> = emptySet()
+    private var validMovesIndices: Set<Int> = emptySet()
 
     fun startReversiGame() {
         launchGui()
@@ -38,8 +38,8 @@ class GameManager : FieldClickListener {
             findButton.addMouseListener(object : MouseListenerAdapter() {
                 override fun mouseClicked(e: MouseEvent?) {
                     super.mouseClicked(e)
-                    validMoves = moveFinder.findLegalMoves(board, FieldState.BLACK)
-                    gameBoardPanel.showValidMoves(validMoves)
+                    validMovesIndices = moveFinder.findLegalMoves(board, FieldState.BLACK)
+                    gameBoardPanel.showPossibleMoves(validMovesIndices)
                 }
             })
             val resetButton = JButton("Reset board")
@@ -56,34 +56,29 @@ class GameManager : FieldClickListener {
             frame.setLocationRelativeTo(null)
             frame.isVisible = true
         }
+
+        gameBoardPanel.drawBoard(board)
     }
 
-    override fun onFieldClicked(index: Int): FieldState {
-        when (playerTurn) {
-            PlayerTurn.BLACK -> {
-                playerTurn = PlayerTurn.WHITE
-                board.boardStateArray[index].fieldState = FieldState.BLACK
-                printBoard()
-                return FieldState.BLACK
-            }
-            PlayerTurn.WHITE -> {
-                playerTurn = PlayerTurn.BLACK
-                board.boardStateArray[index].fieldState = FieldState.WHITE
-                printBoard()
-                return FieldState.WHITE
+    override fun onFieldClicked(index: Int, fieldState: FieldState): FieldState {
+        if(validMovesIndices.contains(index)) {
+            when (playerTurn) {
+                PlayerTurn.BLACK -> {
+                    playerTurn = PlayerTurn.WHITE
+                    board.boardStateArray[index].fieldState = FieldState.BLACK
+                    board.printBoard()
+                    gameBoardPanel.hidePossibleMoves()
+                    return FieldState.BLACK
+                }
+                PlayerTurn.WHITE -> {
+                    playerTurn = PlayerTurn.BLACK
+                    board.boardStateArray[index].fieldState = FieldState.WHITE
+                    board.printBoard()
+                    gameBoardPanel.hidePossibleMoves()
+                    return FieldState.WHITE
+                }
             }
         }
-    }
-
-    private fun printBoard() {
-        for (index in board.boardStateArray.indices) {
-            if (index % 8 == 0) print("\n")
-            if (board.boardStateArray[index].fieldState == FieldState.BLACK)
-                print("x ")
-            else if (board.boardStateArray[index].fieldState == FieldState.WHITE)
-                print("o ")
-            else
-                print("- ")
-        }
+        return fieldState
     }
 }

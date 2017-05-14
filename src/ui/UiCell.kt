@@ -13,7 +13,7 @@ import javax.swing.border.BevelBorder
 class UiCell(background: Color, initialSize: Int, index: Int) : JButton() {
     private val initialSize = initialSize
     val index : Int = index
-    var fieldType : FieldState = FieldState.EMPTY
+    var fieldState: FieldState = FieldState.EMPTY
 
     init {
         isContentAreaFilled = true

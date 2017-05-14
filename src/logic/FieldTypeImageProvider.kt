@@ -6,7 +6,6 @@ import javax.swing.ImageIcon
 import java.io.File
 
 
-
 /**
  * Created by r.makowiecki on 13/05/2017.
  */
@@ -14,13 +13,13 @@ class FieldTypeImageProvider(initialCellSize: Int) {
     val preferredImageSize = initialCellSize
 
     fun getImageForFieldType(fieldType: FieldState): ImageIcon? {
-        var resourcePath = ""
+        var resourcePath: String
         var bufferedImage: BufferedImage? = null
         when (fieldType) {
             FieldState.BLACK -> resourcePath = "res/black.png"
             FieldState.WHITE -> resourcePath = "res/white.png"
             FieldState.POSSIBLE -> resourcePath = "res/possible.png"
-            else -> { }
+            else -> return null
         }
         try {
             val file = File(resourcePath)

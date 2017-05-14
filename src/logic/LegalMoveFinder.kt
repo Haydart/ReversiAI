@@ -7,8 +7,8 @@ import java.util.*
  * Created by r.makowiecki on 13/05/2017.
  */
 class LegalMoveFinder {
-    fun findLegalMoves(board: GameBoard, state: FieldState): Set<Point> {
-        val possibleMoves = HashSet<Point>()
+    fun findLegalMoves(board: GameBoard, state: FieldState): Set<Int> {
+        val possibleMoveIndices = HashSet<Int>()
         val statePoints = board.getSquaresWithState(state)
         for (seed in statePoints) {
             for (direction in Direction.values()) {
@@ -19,7 +19,7 @@ class LegalMoveFinder {
                         if (board.getSquareState(nextPoint) == state) {
                             break
                         } else if (board.getSquareState(nextPoint) == FieldState.EMPTY) {
-                            possibleMoves.add(nextPoint)
+                            possibleMoveIndices.add(nextPoint.y * 8 + nextPoint.x)
                             break
                         }
                         nextPoint = direction.next(nextPoint)
@@ -27,7 +27,7 @@ class LegalMoveFinder {
                 }
             }
         }
-        return possibleMoves
+        return possibleMoveIndices
     }
 
     private fun shouldSearch(board: GameBoard, seed: Point, direction: Direction): Boolean {
