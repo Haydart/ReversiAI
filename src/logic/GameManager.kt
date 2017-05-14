@@ -19,7 +19,9 @@ class GameManager : FieldClickListener {
     var playerTurn: PlayerTurn = PlayerTurn.BLACK
         private set
     private val board = GameBoard()
+    private val gameBoardPanel = GameBoardPanel(cellColor, preferredCellSize, this)
     private val moveFinder = LegalMoveFinder()
+    private var validMoves: Set<Point> = emptySet()
 
     fun startReversiGame() {
         launchGui()
@@ -36,7 +38,8 @@ class GameManager : FieldClickListener {
             findButton.addMouseListener(object: MouseListenerAdapter() {
                 override fun mouseClicked(e: MouseEvent?) {
                     super.mouseClicked(e)
-                    println(moveFinder.findLegalMoves(board, FieldState.BLACK))
+                    validMoves = moveFinder.findLegalMoves(board, FieldState.WHITE.opposite())
+                    gameBoardPanel.showValidMoves(validMoves)
                 }
             })
             val resetButton = JButton("Reset board")
@@ -46,7 +49,7 @@ class GameManager : FieldClickListener {
             frame.layout = FlowLayout()
             frame.preferredSize = Dimension(750, 750)
             frame.minimumSize = Dimension(700, 750)
-            frame.add(GameBoardPanel(cellColor, preferredCellSize, this))
+            frame.add(gameBoardPanel)
             frame.add(findButton)
             frame.add(resetButton)
             frame.pack()

@@ -1,10 +1,8 @@
 package logic
 
-import java.awt.Dimension
 import java.awt.image.BufferedImage
 import javax.imageio.ImageIO
 import javax.swing.ImageIcon
-import com.sun.tools.corba.se.idl.Util.getAbsolutePath
 import java.io.File
 
 
@@ -12,8 +10,10 @@ import java.io.File
 /**
  * Created by r.makowiecki on 13/05/2017.
  */
-class FieldTypeImageProvider {
-    fun getImageForFieldType(fieldType: FieldState, preferredImageSize: Dimension): ImageIcon? {
+class FieldTypeImageProvider(initialCellSize: Int) {
+    val preferredImageSize = initialCellSize
+
+    fun getImageForFieldType(fieldType: FieldState): ImageIcon? {
         var resourcePath = ""
         var bufferedImage: BufferedImage? = null
         when (fieldType) {
@@ -32,7 +32,7 @@ class FieldTypeImageProvider {
             ex.printStackTrace()
         } finally {
             val image = ImageIcon(bufferedImage).image
-            val scaledImage = image.getScaledInstance(preferredImageSize.width, preferredImageSize.height, java.awt.Image.SCALE_SMOOTH)
+            val scaledImage = image.getScaledInstance(preferredImageSize, preferredImageSize, java.awt.Image.SCALE_SMOOTH)
             return ImageIcon(scaledImage)
         }
     }
