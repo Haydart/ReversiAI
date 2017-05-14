@@ -35,7 +35,7 @@ class GameBoardPanel(cellColor: Color, initialCellSize: Int, fieldClickListener:
 
     fun showValidMoves(validMoves: Set<Point>) {
         for (point in validMoves) {
-            val field = fieldArray[point.x * 8 + point.y]
+            val field = fieldArray[point.y * 8 + point.x]
             field!!.fieldType = FieldState.POSSIBLE
             field.icon = imageProvider.getImageForFieldType(field.fieldType)
         }

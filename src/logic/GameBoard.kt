@@ -8,7 +8,7 @@ import java.awt.Point
 class GameBoard {
     val boardStateArray = Array(64, { BoardField() })
 
-    fun getSquareState(point: Point): FieldState = boardStateArray[point.x * 8 + point.y].fieldState
+    fun getSquareState(point: Point): FieldState = boardStateArray[point.y * 8 + point.x].fieldState
 
     fun isPointValid(nextPoint: Point): Boolean = nextPoint.x in 0..7 && nextPoint.y in 0..7
 

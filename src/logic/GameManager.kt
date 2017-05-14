@@ -35,10 +35,10 @@ class GameManager : FieldClickListener {
             }
 
             val findButton = JButton("Find legal moves")
-            findButton.addMouseListener(object: MouseListenerAdapter() {
+            findButton.addMouseListener(object : MouseListenerAdapter() {
                 override fun mouseClicked(e: MouseEvent?) {
                     super.mouseClicked(e)
-                    validMoves = moveFinder.findLegalMoves(board, FieldState.WHITE.opposite())
+                    validMoves = moveFinder.findLegalMoves(board, FieldState.BLACK)
                     gameBoardPanel.showValidMoves(validMoves)
                 }
             })
@@ -63,13 +63,27 @@ class GameManager : FieldClickListener {
             PlayerTurn.BLACK -> {
                 playerTurn = PlayerTurn.WHITE
                 board.boardStateArray[index].fieldState = FieldState.BLACK
-                        return FieldState.BLACK
+                printBoard()
+                return FieldState.BLACK
             }
             PlayerTurn.WHITE -> {
                 playerTurn = PlayerTurn.BLACK
                 board.boardStateArray[index].fieldState = FieldState.WHITE
+                printBoard()
                 return FieldState.WHITE
             }
+        }
+    }
+
+    private fun printBoard() {
+        for (index in board.boardStateArray.indices) {
+            if (index % 8 == 0) print("\n")
+            if (board.boardStateArray[index].fieldState == FieldState.BLACK)
+                print("x ")
+            else if (board.boardStateArray[index].fieldState == FieldState.WHITE)
+                print("o ")
+            else
+                print("- ")
         }
     }
 }

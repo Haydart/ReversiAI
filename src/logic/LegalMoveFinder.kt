@@ -16,9 +16,9 @@ class LegalMoveFinder {
                     var nextPoint = direction.next(seed)
                     nextPoint = direction.next(nextPoint)
                     while (board.isPointValid(nextPoint)) {
-                        if (board.getSquareState(nextPoint) === state) {
+                        if (board.getSquareState(nextPoint) == state) {
                             break
-                        } else if (board.getSquareState(nextPoint) === FieldState.EMPTY) {
+                        } else if (board.getSquareState(nextPoint) == FieldState.EMPTY) {
                             possibleMoves.add(nextPoint)
                             break
                         }
@@ -32,6 +32,8 @@ class LegalMoveFinder {
 
     private fun shouldSearch(board: GameBoard, seed: Point, direction: Direction): Boolean {
         val nextPoint = direction.next(seed)
-        return board.getSquareState(nextPoint) === board.getSquareState(seed).opposite()
+        val state1 = board.getSquareState(nextPoint)
+        val state2 = board.getSquareState(seed).opposite()
+        return state1 == state2
     }
 }
