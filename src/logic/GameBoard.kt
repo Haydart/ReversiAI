@@ -7,6 +7,7 @@ import java.awt.Point
  */
 class GameBoard {
     val boardStateArray = Array(64, { BoardField() })
+    var blackPossibleMoves: Set<Int> = setOf(34, 29, 20, 43)
 
     init {
         setupInitialFields()
@@ -19,9 +20,9 @@ class GameBoard {
         boardStateArray[36].fieldState = FieldState.BLACK
     }
 
-    fun getSquareState(point: Point): FieldState = boardStateArray[point.y * 8 + point.x].fieldState
+    fun getFieldState(point: Point): FieldState = boardStateArray[point.y * 8 + point.x].fieldState
 
-    fun isPointValid(nextPoint: Point): Boolean = nextPoint.x in 0..7 && nextPoint.y in 0..7
+    fun isPointValid(fieldCoordinates: Point): Boolean = fieldCoordinates.x in 0..7 && fieldCoordinates.y in 0..7
 
     fun getSquaresWithState(state: FieldState): List<Point> = boardStateArray.filter { it.fieldState === state }.map { it.coordinates }
 
@@ -34,6 +35,12 @@ class GameBoard {
                     else if (boardStateArray[index].fieldState == FieldState.POSSIBLE) "* "
                     else "- "
             )
+        }
+    }
+
+    fun flipFieldsAffectedByMove(fieldsToFlip: Set<Int>) {
+        for(index in fieldsToFlip) {
+            boardStateArray[index].fieldState = boardStateArray[index].fieldState.opposite()
         }
     }
 }

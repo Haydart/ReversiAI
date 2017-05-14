@@ -7,10 +7,12 @@ import java.awt.Point
  */
 class BoardField {
     var fieldState: FieldState = FieldState.EMPTY
+    val index: Int
     val coordinates: Point
 
     init {
         coordinates = Point(objectsCount % 8, objectsCount / 8)
+        index = objectsCount
         objectsCount++
         println("$coordinates, $objectsCount")
     }
