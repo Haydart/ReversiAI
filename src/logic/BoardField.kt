@@ -6,11 +6,11 @@ import java.awt.Point
  * Created by r.makowiecki on 13/05/2017.
  */
 class BoardField {
-    var fieldState: FieldState = FieldState.BLACK
+    var fieldState: FieldState = FieldState.EMPTY
     val coordinates: Point
 
     init {
-        coordinates = Point(objectsCount / 8, objectsCount % 8)
+        coordinates = Point(objectsCount % 8, objectsCount / 8)
         objectsCount++
         println("$coordinates, $objectsCount")
     }

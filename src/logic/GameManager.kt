@@ -2,7 +2,9 @@ package logic
 
 import ui.FieldClickListener
 import ui.GameBoardPanel
+import ui.MouseListenerAdapter
 import java.awt.*
+import java.awt.event.MouseEvent
 import javax.swing.JButton
 import javax.swing.JFrame
 import javax.swing.UIManager
@@ -17,6 +19,7 @@ class GameManager : FieldClickListener {
     var playerTurn: PlayerTurn = PlayerTurn.BLACK
         private set
     private val board = GameBoard()
+    private val moveFinder = LegalMoveFinder()
 
     fun startReversiGame() {
         launchGui()
@@ -30,6 +33,12 @@ class GameManager : FieldClickListener {
             }
 
             val findButton = JButton("Find legal moves")
+            findButton.addMouseListener(object: MouseListenerAdapter() {
+                override fun mouseClicked(e: MouseEvent?) {
+                    super.mouseClicked(e)
+                    println(moveFinder.findLegalMoves(board, FieldState.BLACK))
+                }
+            })
             val resetButton = JButton("Reset board")
 
             val frame = JFrame("Reversi")
@@ -50,10 +59,12 @@ class GameManager : FieldClickListener {
         when (playerTurn) {
             PlayerTurn.BLACK -> {
                 playerTurn = PlayerTurn.WHITE
-                return FieldState.BLACK
+                board.boardStateArray[index].fieldState = FieldState.BLACK
+                        return FieldState.BLACK
             }
             PlayerTurn.WHITE -> {
                 playerTurn = PlayerTurn.BLACK
+                board.boardStateArray[index].fieldState = FieldState.WHITE
                 return FieldState.WHITE
             }
         }

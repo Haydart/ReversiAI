@@ -12,5 +12,5 @@ class GameBoard {
 
     fun isPointValid(nextPoint: Point): Boolean = nextPoint.x in 0..7 && nextPoint.y in 0..7
 
-    fun getSquaresWithState(state: FieldState): List<Point> = boardStateArray.filter { it.fieldState == state }.map { it.coordinates }
+    fun getSquaresWithState(state: FieldState): List<Point> = boardStateArray.filter { it.fieldState === state }.map { it.coordinates }
 }
