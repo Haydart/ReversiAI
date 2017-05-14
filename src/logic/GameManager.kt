@@ -37,7 +37,7 @@ class GameManager : FieldClickListener {
             findButton.addMouseListener(object : MouseListenerAdapter() {
                 override fun mouseClicked(e: MouseEvent?) {
                     super.mouseClicked(e)
-                    gameBoardPanel.showPossibleMoves(board.blackPossibleMoves)
+                    gameBoardPanel.showPossibleMoves(board.possibleMoves)
                 }
             })
             val resetButton = JButton("Reset board")
@@ -60,14 +60,14 @@ class GameManager : FieldClickListener {
 
     override fun onFieldClicked(index: Int): FieldState {
         val oldFieldState = board.boardStateArray[index].fieldState
-        if (board.blackPossibleMoves.contains(index)) {
+        if (board.possibleMoves.contains(index)) {
             when (playerTurn) {
                 PlayerTurn.BLACK -> {
                     playerTurn = PlayerTurn.WHITE
                     board.boardStateArray[index].fieldState = FieldState.BLACK
-                    gameBoardPanel.hidePossibleMoves(board.blackPossibleMoves)
+                    gameBoardPanel.hidePossibleMoves(board.possibleMoves)
                     board.flipFieldsAffectedByMove(legalMoveManager.findFieldsFlippedByMove(board, index))
-                    board.blackPossibleMoves = legalMoveManager.findLegalMoves(board, FieldState.WHITE)
+                    board.possibleMoves = legalMoveManager.findLegalMoves(board, FieldState.WHITE)
                     gameBoardPanel.drawBoard(board)
                     board.printBoard()
                     return FieldState.BLACK
@@ -75,14 +75,16 @@ class GameManager : FieldClickListener {
                 PlayerTurn.WHITE -> {
                     playerTurn = PlayerTurn.BLACK
                     board.boardStateArray[index].fieldState = FieldState.WHITE
-                    gameBoardPanel.hidePossibleMoves(board.blackPossibleMoves)
+                    gameBoardPanel.hidePossibleMoves(board.possibleMoves)
                     board.flipFieldsAffectedByMove(legalMoveManager.findFieldsFlippedByMove(board, index))
-                    board.blackPossibleMoves = legalMoveManager.findLegalMoves(board, FieldState.BLACK)
+                    board.possibleMoves = legalMoveManager.findLegalMoves(board, FieldState.BLACK)
                     gameBoardPanel.drawBoard(board)
                     board.printBoard()
                     return FieldState.WHITE
                 }
             }
+        } else if (board.possibleMoves.isEmpty()) {
+            playerTurn = if (playerTurn === PlayerTurn.WHITE) PlayerTurn.BLACK else PlayerTurn.WHITE
         }
         return oldFieldState
     }

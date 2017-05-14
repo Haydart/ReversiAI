@@ -7,7 +7,7 @@ import java.awt.Point
  */
 class GameBoard {
     val boardStateArray = Array(64, { BoardField() })
-    var blackPossibleMoves: Set<Int> = setOf(34, 29, 20, 43)
+    var possibleMoves: Set<Int> = setOf(34, 29, 20, 43)
 
     init {
         setupInitialFields()
