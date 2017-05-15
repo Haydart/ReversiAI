@@ -69,6 +69,7 @@ class GameManager : FieldClickListener, BoardUpdateListener {
     }
 
     fun beginAiTurn() {
+        println("AI turn began")
         playerTurn = PlayerTurn.WHITE
         board.possibleMoves = legalMoveManager.findLegalMoves(board, FieldState.WHITE)
         board.boardState.whiteFieldsCount = board.getSquaresWithState(FieldState.WHITE).size
@@ -86,7 +87,7 @@ class GameManager : FieldClickListener, BoardUpdateListener {
             board.printBoard()
 
             if (!board.boardState.isEndOfGame()) {
-                playerTurn = PlayerTurn.BLACK
+                beginUserTurn()
             } else println(board.boardState.getGameResult())
         } else if (board.possibleMoves.isEmpty() && !board.boardState.isEndOfGame()) {
             beginUserTurn()
@@ -97,10 +98,15 @@ class GameManager : FieldClickListener, BoardUpdateListener {
     }
 
     fun beginUserTurn() {
+        println("User turn began")
         playerTurn = PlayerTurn.BLACK
         board.possibleMoves = legalMoveManager.findLegalMoves(board, FieldState.BLACK)
         board.boardState.blackFieldsCount = board.getSquaresWithState(FieldState.BLACK).size
         board.boardState.blackMobility = board.possibleMoves.size
+
+        if (board.boardState.isEndOfGame()) {
+            println(board.boardState.getGameResult())
+        }
     }
 
     override fun onFieldClicked(index: Int): FieldState? {

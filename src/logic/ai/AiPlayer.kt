@@ -10,7 +10,7 @@ class AiPlayer {
     var resultPair : Pair<Int, FieldState> = Pair(0, FieldState.EMPTY)
 
     fun performMove(possibleMoves: Set<Int>) : Pair<Int, FieldState> {
-        for(j in 0..100000) { //simulate ai algorithm duration
+        for(j in 0..1) { //simulate ai algorithm duration
             val index = Random().nextInt(possibleMoves.size)
             val iterator = possibleMoves.iterator()
             for (i in 0..index - 1) {
