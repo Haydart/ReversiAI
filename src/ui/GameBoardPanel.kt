@@ -26,9 +26,11 @@ class GameBoardPanel(cellColor: Color, initialCellSize: Int, fieldClickListener:
                     super.mouseClicked(e)
                     println("Clicked field $index")
                     val newFieldState = fieldClickListener.onFieldClicked(field.index)
-                    field.fieldState = newFieldState
-                    drawField(field.index, newFieldState)
-                    boardUpdateListener.onBoardUiUpdatedAfterUserMove()
+                    if(newFieldState != null) {
+                        field.fieldState = newFieldState
+                        drawField(field.index, newFieldState)
+                        boardUpdateListener.onBoardUiUpdatedAfterUserMove()
+                    }
                 }
             })
             uiCellArray[index] = field

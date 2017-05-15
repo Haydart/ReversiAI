@@ -61,57 +61,67 @@ class GameManager : FieldClickListener, BoardUpdateListener {
             frame.setLocationRelativeTo(null)
             frame.isVisible = true
         }
-
         gameBoardPanel.drawBoard(board)
     }
 
-    override fun onFieldClicked(index: Int): FieldState {
-        val fieldState = board.boardStateArray[index].fieldState
-        if (board.possibleMoves.contains(index) && playerTurn === PlayerTurn.BLACK) {
-            board.boardStateArray[index].fieldState = FieldState.BLACK
-            gameBoardPanel.hidePossibleMoves(board.possibleMoves)
-            board.flipFieldsAffectedByMove(legalMoveManager.findFieldsFlippedByMove(board, index))
-            board.possibleMoves = legalMoveManager.findLegalMoves(board, FieldState.WHITE)
-            gameBoardPanel.drawBoard(board)
-            board.printBoard()
-            playerTurn = PlayerTurn.WHITE
-            beginAiTurn()
-            return FieldState.BLACK
-        } else if (board.possibleMoves.isEmpty() && !board.boardState.isEndOfGame()) {
-            playerTurn = PlayerTurn.WHITE
-            board.possibleMoves = legalMoveManager.findLegalMoves(board, FieldState.WHITE)
-            println("No moves possible, giving up the turn to $playerTurn")
-        }  else if(board.boardState.isEndOfGame()) {
-            println(board.boardState.getGameResult())
-        }
-        return fieldState
-    }
-
     override fun onBoardUiUpdatedAfterUserMove() {
-        if(!board.boardState.isEndOfGame()) {
-            beginAiTurn()
-        } else println(board.boardState.getGameResult())
+        beginAiTurn()
     }
 
     fun beginAiTurn() {
-        if(playerTurn === PlayerTurn.WHITE && !board.possibleMoves.isEmpty()) {
+        playerTurn = PlayerTurn.WHITE
+        board.possibleMoves = legalMoveManager.findLegalMoves(board, FieldState.WHITE)
+        board.boardState.whiteFieldsCount = board.getSquaresWithState(FieldState.WHITE).size
+        board.boardState.whiteMobility = board.possibleMoves.size
+
+        if (!board.possibleMoves.isEmpty()) {
             val movedField = aiPlayer.performMove(board.possibleMoves)
             board.boardStateArray[movedField.first].fieldState = movedField.second
             gameBoardPanel.hidePossibleMoves(board.possibleMoves)
             board.flipFieldsAffectedByMove(legalMoveManager.findFieldsFlippedByMove(board, movedField.first))
             board.possibleMoves = legalMoveManager.findLegalMoves(board, FieldState.BLACK)
+            board.boardState.whiteFieldsCount = board.getSquaresWithState(FieldState.WHITE).size
+            board.boardState.whiteMobility = board.possibleMoves.size
             gameBoardPanel.drawBoard(board)
             board.printBoard()
 
-            if(!board.boardState.isEndOfGame()) {
+            if (!board.boardState.isEndOfGame()) {
                 playerTurn = PlayerTurn.BLACK
             } else println(board.boardState.getGameResult())
-        } else if(board.possibleMoves.isEmpty() && !board.boardState.isEndOfGame()) {
-            playerTurn = PlayerTurn.BLACK
+        } else if (board.possibleMoves.isEmpty() && !board.boardState.isEndOfGame()) {
+            beginUserTurn()
             println("No moves possible, giving up the turn to $playerTurn")
-            board.possibleMoves = legalMoveManager.findLegalMoves(board, FieldState.BLACK)
-        } else if(board.boardState.isEndOfGame()) {
+        } else if (board.boardState.isEndOfGame()) {
             println(board.boardState.getGameResult())
         }
+    }
+
+    fun beginUserTurn() {
+        playerTurn = PlayerTurn.BLACK
+        board.possibleMoves = legalMoveManager.findLegalMoves(board, FieldState.BLACK)
+        board.boardState.blackFieldsCount = board.getSquaresWithState(FieldState.BLACK).size
+        board.boardState.blackMobility = board.possibleMoves.size
+    }
+
+    override fun onFieldClicked(index: Int): FieldState? {
+        if (board.possibleMoves.contains(index) && playerTurn === PlayerTurn.BLACK) {
+            board.boardStateArray[index].fieldState = FieldState.BLACK
+            gameBoardPanel.hidePossibleMoves(board.possibleMoves)
+            board.flipFieldsAffectedByMove(legalMoveManager.findFieldsFlippedByMove(board, index))
+
+            gameBoardPanel.drawBoard(board)
+            board.printBoard()
+
+            return FieldState.BLACK
+        } else if (board.possibleMoves.isEmpty() && !board.boardState.isEndOfGame()) {
+            playerTurn = PlayerTurn.WHITE
+            board.possibleMoves = legalMoveManager.findLegalMoves(board, FieldState.WHITE)
+            board.boardState.whiteFieldsCount = board.getSquaresWithState(FieldState.WHITE).size
+            board.boardState.whiteMobility = board.possibleMoves.size
+            println("No moves possible, giving up the turn to $playerTurn")
+        } else if (board.boardState.isEndOfGame()) {
+            println(board.boardState.getGameResult())
+        }
+        return null
     }
 }
