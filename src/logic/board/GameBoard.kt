@@ -6,6 +6,7 @@ package logic.board
 class GameBoard {
     val boardStateArray = Array(64, { BoardField() })
     var possibleMoves: Set<Int> = setOf(34, 29, 20, 43)
+    val boardState: GameState = GameState()
 
     init {
         setupInitialFields()

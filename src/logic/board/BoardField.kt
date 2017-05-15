@@ -12,7 +12,7 @@ class BoardField {
         coordinates = java.awt.Point(objectsCount % 8, objectsCount / 8)
         index = logic.board.BoardField.Companion.objectsCount
         logic.board.BoardField.Companion.objectsCount++
-        println("$coordinates, ${logic.board.BoardField.Companion.objectsCount}")
+        println("$coordinates, $objectsCount")
     }
 
     companion object {

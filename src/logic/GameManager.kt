@@ -77,19 +77,24 @@ class GameManager : FieldClickListener, BoardUpdateListener {
             playerTurn = PlayerTurn.WHITE
             beginAiTurn()
             return FieldState.BLACK
-        } else if (board.possibleMoves.isEmpty()) {
-            playerTurn = if (playerTurn === PlayerTurn.WHITE) PlayerTurn.BLACK else PlayerTurn.WHITE
+        } else if (board.possibleMoves.isEmpty() && !board.boardState.isEndOfGame()) {
+            playerTurn = PlayerTurn.WHITE
+            board.possibleMoves = legalMoveManager.findLegalMoves(board, FieldState.WHITE)
             println("No moves possible, giving up the turn to $playerTurn")
+        }  else if(board.boardState.isEndOfGame()) {
+            println(board.boardState.getGameResult())
         }
         return fieldState
     }
 
     override fun onBoardUiUpdatedAfterUserMove() {
-        beginAiTurn()
+        if(!board.boardState.isEndOfGame()) {
+            beginAiTurn()
+        } else println(board.boardState.getGameResult())
     }
 
     fun beginAiTurn() {
-        if(playerTurn === PlayerTurn.WHITE) {
+        if(playerTurn === PlayerTurn.WHITE && !board.possibleMoves.isEmpty()) {
             val movedField = aiPlayer.performMove(board.possibleMoves)
             board.boardStateArray[movedField.first].fieldState = movedField.second
             gameBoardPanel.hidePossibleMoves(board.possibleMoves)
@@ -97,7 +102,16 @@ class GameManager : FieldClickListener, BoardUpdateListener {
             board.possibleMoves = legalMoveManager.findLegalMoves(board, FieldState.BLACK)
             gameBoardPanel.drawBoard(board)
             board.printBoard()
+
+            if(!board.boardState.isEndOfGame()) {
+                playerTurn = PlayerTurn.BLACK
+            } else println(board.boardState.getGameResult())
+        } else if(board.possibleMoves.isEmpty() && !board.boardState.isEndOfGame()) {
             playerTurn = PlayerTurn.BLACK
+            println("No moves possible, giving up the turn to $playerTurn")
+            board.possibleMoves = legalMoveManager.findLegalMoves(board, FieldState.BLACK)
+        } else if(board.boardState.isEndOfGame()) {
+            println(board.boardState.getGameResult())
         }
     }
 }
