@@ -1,5 +1,6 @@
 package logic
 
+import logic.board.FieldState
 import java.awt.image.BufferedImage
 import javax.imageio.ImageIO
 import javax.swing.ImageIcon

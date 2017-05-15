@@ -1,5 +1,8 @@
 package logic
 
+import logic.board.Direction
+import logic.board.FieldState
+import logic.board.GameBoard
 import java.awt.Point
 
 
@@ -31,7 +34,7 @@ class LegalMoveManager {
     }
 
     fun findFieldsFlippedByMove(board: GameBoard, performedMove: Int): Set<Int> {
-        val filledlist = HashSet<Point>()
+        val flippedFieldsList = HashSet<Point>()
         val performedMoveState = board.boardStateArray[performedMove].fieldState
         val performedMoveCoordinates = board.boardStateArray[performedMove].coordinates
         for (direction in Direction.values()) {
@@ -44,7 +47,7 @@ class LegalMoveManager {
                     if (nextState === performedMoveState.opposite()) {
                         tempSet.add(nextPoint)
                     } else if (nextState === performedMoveState) {
-                        filledlist.addAll(tempSet)
+                        flippedFieldsList.addAll(tempSet)
                         break
                     } else if (nextState === FieldState.EMPTY) {
                         break
@@ -53,7 +56,7 @@ class LegalMoveManager {
                 }
             }
         }
-        return filledlist.map { it.y * 8 + it.x }.toSet()
+        return flippedFieldsList.map { it.y * 8 + it.x }.toSet()
     }
 
     private fun shouldSearch(board: GameBoard, seed: Point, direction: Direction): Boolean {

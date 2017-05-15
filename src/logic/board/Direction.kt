@@ -1,4 +1,4 @@
-package logic
+package logic.board
 
 import java.awt.Point
 

@@ -1,8 +1,8 @@
 package ui
 
-import logic.FieldState
+import logic.board.FieldState
 import logic.FieldTypeImageProvider
-import logic.GameBoard
+import logic.board.GameBoard
 import java.awt.Color
 import java.awt.Point
 import java.awt.event.MouseEvent
@@ -11,9 +11,10 @@ import javax.swing.JPanel
 /**
  * Created by r.makowiecki on 12/05/2017.
  */
-class GameBoardPanel(cellColor: Color, initialCellSize: Int, fieldClickListener: FieldClickListener) : JPanel() {
+class GameBoardPanel(cellColor: Color, initialCellSize: Int, fieldClickListener: FieldClickListener, boardUpdateListener: BoardUpdateListener) : JPanel() {
     private val imageProvider = FieldTypeImageProvider(initialCellSize)
     private var uiCellArray = Array<UiCell?>(64, { null })
+    private val boardUpdateListener = boardUpdateListener
 
     init {
         layout = ChessBoardLayoutManager(initialCellSize)
@@ -27,6 +28,7 @@ class GameBoardPanel(cellColor: Color, initialCellSize: Int, fieldClickListener:
                     val newFieldState = fieldClickListener.onFieldClicked(field.index)
                     field.fieldState = newFieldState
                     drawField(field.index, newFieldState)
+                    boardUpdateListener.onBoardUiUpdatedAfterUserMove()
                 }
             })
             uiCellArray[index] = field

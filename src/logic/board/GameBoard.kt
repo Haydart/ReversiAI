@@ -1,6 +1,4 @@
-package logic
-
-import java.awt.Point
+package logic.board
 
 /**
  * Created by r.makowiecki on 13/05/2017.
@@ -20,11 +18,11 @@ class GameBoard {
         boardStateArray[36].fieldState = FieldState.BLACK
     }
 
-    fun getFieldState(point: Point): FieldState = boardStateArray[point.y * 8 + point.x].fieldState
+    fun getFieldState(point: java.awt.Point): FieldState = boardStateArray[point.y * 8 + point.x].fieldState
 
-    fun isPointValid(fieldCoordinates: Point): Boolean = fieldCoordinates.x in 0..7 && fieldCoordinates.y in 0..7
+    fun isPointValid(fieldCoordinates: java.awt.Point): Boolean = fieldCoordinates.x in 0..7 && fieldCoordinates.y in 0..7
 
-    fun getSquaresWithState(state: FieldState): List<Point> = boardStateArray.filter { it.fieldState === state }.map { it.coordinates }
+    fun getSquaresWithState(state: FieldState): List<java.awt.Point> = boardStateArray.filter { it.fieldState === state }.map { it.coordinates }
 
     fun printBoard() {
         for (index in boardStateArray.indices) {

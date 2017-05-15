@@ -1,6 +1,6 @@
 package ui
 
-import logic.FieldState
+import logic.board.FieldState
 import java.awt.Color
 import java.awt.Dimension
 import javax.swing.BorderFactory
