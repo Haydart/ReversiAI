@@ -106,6 +106,8 @@ class GameManager : FieldClickListener, BoardUpdateListener {
 
         if (board.boardState.isEndOfGame()) {
             println(board.boardState.getGameResult())
+        } else if(board.possibleMoves.isEmpty()) {
+            beginAiTurn()
         }
     }
 

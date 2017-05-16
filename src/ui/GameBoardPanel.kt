@@ -11,10 +11,9 @@ import javax.swing.JPanel
 /**
  * Created by r.makowiecki on 12/05/2017.
  */
-class GameBoardPanel(cellColor: Color, initialCellSize: Int, fieldClickListener: FieldClickListener, boardUpdateListener: BoardUpdateListener) : JPanel() {
+class GameBoardPanel(cellColor: Color, initialCellSize: Int, fieldClickListener: FieldClickListener, private val boardUpdateListener: BoardUpdateListener) : JPanel() {
     private val imageProvider = FieldTypeImageProvider(initialCellSize)
     private var uiCellArray = Array<UiCell?>(64, { null })
-    private val boardUpdateListener = boardUpdateListener
 
     init {
         layout = ChessBoardLayoutManager(initialCellSize)
