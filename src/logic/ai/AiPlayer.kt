@@ -1,23 +1,17 @@
 package logic.ai
 
+import logic.ai.evaluation.Evaluator
+import logic.ai.searching.Searcher
 import logic.board.FieldState
-import java.util.*
+import logic.board.GameBoard
 
 /**
  * Created by r.makowiecki on 15/05/2017.
  */
-class AiPlayer {
-    var resultPair : Pair<Int, FieldState> = Pair(0, FieldState.EMPTY)
+class AiPlayer(searcher: Searcher, evaluator: Evaluator, depth: Int) {
+    val searcher = searcher
+    val evaluator = evaluator
+    val depth = depth
 
-    fun performMove(possibleMoves: Set<Int>) : Pair<Int, FieldState> {
-        for(j in 0..1) { //simulate ai algorithm duration
-            val index = Random().nextInt(possibleMoves.size)
-            val iterator = possibleMoves.iterator()
-            for (i in 0..index - 1) {
-                iterator.next()
-            }
-            resultPair = Pair(iterator.next(), FieldState.WHITE)
-        }
-        return resultPair
-    }
+    fun performMove(board: GameBoard, possibleMoves: Set<Int>) = Pair(searcher.search(board, possibleMoves, depth), FieldState.WHITE)
 }

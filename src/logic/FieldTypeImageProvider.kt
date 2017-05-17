@@ -1,7 +1,6 @@
 package logic
 
 import logic.board.FieldState
-import java.awt.image.BufferedImage
 import javax.imageio.ImageIO
 import javax.swing.ImageIcon
 import java.io.File
@@ -12,28 +11,18 @@ import java.io.File
  */
 class FieldTypeImageProvider(initialCellSize: Int) {
     val preferredImageSize = initialCellSize
+    val whitePawnImage = retrieveImage("res/white.png")
+    val blackPawnImage = retrieveImage("res/black.png")
+    val possibleFieldImage = retrieveImage("res/possible.png")
 
-    fun getImageForFieldType(fieldType: FieldState): ImageIcon? {
-        var resourcePath: String
-        var bufferedImage: BufferedImage? = null
-        when (fieldType) {
-            FieldState.BLACK -> resourcePath = "res/black.png"
-            FieldState.WHITE -> resourcePath = "res/white.png"
-            FieldState.POSSIBLE -> resourcePath = "res/possible.png"
-            else -> return null
-        }
-        try {
-            val file = File(resourcePath)
-            if (!file.exists()) {
-                System.err.println("my file is not there, I was looking at " + file.absolutePath)
+    fun getImageForFieldType(fieldType: FieldState): ImageIcon? =
+            when (fieldType) {
+                FieldState.BLACK -> blackPawnImage
+                FieldState.WHITE -> whitePawnImage
+                FieldState.POSSIBLE -> possibleFieldImage
+                else -> null
             }
-            bufferedImage = ImageIO.read(file)
-        } catch (ex: Exception) {
-            ex.printStackTrace()
-        } finally {
-            val image = ImageIcon(bufferedImage).image
-            val scaledImage = image.getScaledInstance(preferredImageSize, preferredImageSize, java.awt.Image.SCALE_SMOOTH)
-            return ImageIcon(scaledImage)
-        }
-    }
+
+    private fun retrieveImage(path: String): ImageIcon? =
+            ImageIcon(ImageIcon(ImageIO.read(File(path))).image.getScaledInstance(preferredImageSize, preferredImageSize, java.awt.Image.SCALE_SMOOTH))
 }
