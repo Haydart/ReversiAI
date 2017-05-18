@@ -1,11 +1,11 @@
 package logic.ai.evaluation
 
-import logic.PlayerTurn
+import logic.board.FieldState
 import logic.board.GameBoard
 
 /**
  * Created by r.makowiecki on 16/05/2017.
  */
 interface Evaluator {
-    fun evaluate(board: GameBoard, player: PlayerTurn) : Int
+    fun evaluate(board: GameBoard, ownedFieldsType: FieldState): Int
 }

@@ -2,6 +2,7 @@ package logic
 
 import logic.ai.AiPlayer
 import logic.ai.evaluation.OwnershipEvaluator
+import logic.ai.evaluation.field_weights.StandardFieldWeightProvider
 import logic.ai.searching.RandomSearcher
 import logic.board.FieldState
 import logic.board.GameBoard
@@ -28,8 +29,7 @@ class GameManager : FieldClickListener, BoardUpdateListener {
         private set
     private val board = GameBoard()
     private val gameBoardPanel = GameBoardPanel(cellColor, preferredCellSize, this, this)
-    private val legalMoveManager = LegalMoveManager()
-    private val aiPlayer = AiPlayer(RandomSearcher(), OwnershipEvaluator(), 3)
+    private val aiPlayer = AiPlayer(RandomSearcher(), OwnershipEvaluator(StandardFieldWeightProvider()), 3, FieldState.WHITE)
 
     fun startReversiGame() {
         launchGui()
@@ -73,17 +73,17 @@ class GameManager : FieldClickListener, BoardUpdateListener {
     fun beginAiTurn() {
         println("AI turn began")
         playerTurn = PlayerTurn.WHITE
-        board.possibleMoves = legalMoveManager.findLegalMoves(board, FieldState.WHITE)
+        board.possibleMoves = board.legalMoveManager.findLegalMoves(board, FieldState.WHITE)
         board.boardState.whiteFieldsCount = board.getSquaresWithState(FieldState.WHITE).size
         board.boardState.whiteMobility = board.possibleMoves.size
-        board.boardState.blackMobility = legalMoveManager.findLegalMoves(board, FieldState.BLACK).size
+        board.boardState.blackMobility = board.legalMoveManager.findLegalMoves(board, FieldState.BLACK).size
 
         if (board.boardState.whiteMobility != 0) {
             val movedField = aiPlayer.performMove(board, board.possibleMoves)
             board.boardStateArray[movedField.first].fieldState = movedField.second
             gameBoardPanel.hidePossibleMoves(board.possibleMoves)
-            board.flipFieldsAffectedByMove(legalMoveManager.findFieldsFlippedByMove(board, movedField.first))
-            board.possibleMoves = legalMoveManager.findLegalMoves(board, FieldState.BLACK)
+            board.flipFieldsAffectedByMove(board.legalMoveManager.findFieldsFlippedByMove(board, movedField.first))
+            board.possibleMoves = board.legalMoveManager.findLegalMoves(board, FieldState.BLACK)
             board.boardState.whiteFieldsCount = board.getSquaresWithState(FieldState.WHITE).size
             board.boardState.whiteMobility = board.possibleMoves.size
             gameBoardPanel.drawBoard(board)
@@ -101,10 +101,10 @@ class GameManager : FieldClickListener, BoardUpdateListener {
     fun beginUserTurn() {
         println("User turn began")
         playerTurn = PlayerTurn.BLACK
-        board.possibleMoves = legalMoveManager.findLegalMoves(board, FieldState.BLACK)
+        board.possibleMoves = board.legalMoveManager.findLegalMoves(board, FieldState.BLACK)
         board.boardState.blackFieldsCount = board.getSquaresWithState(FieldState.BLACK).size
         board.boardState.blackMobility = board.possibleMoves.size
-        board.boardState.whiteMobility = legalMoveManager.findLegalMoves(board, FieldState.WHITE).size
+        board.boardState.whiteMobility = board.legalMoveManager.findLegalMoves(board, FieldState.WHITE).size
 
         if (board.boardState.blackMobility == 0) {
             println("No moves possible, giving up the turn to WHITE")
@@ -118,7 +118,7 @@ class GameManager : FieldClickListener, BoardUpdateListener {
         if (board.possibleMoves.contains(index) && playerTurn === PlayerTurn.BLACK) {
             board.boardStateArray[index].fieldState = FieldState.BLACK
             gameBoardPanel.hidePossibleMoves(board.possibleMoves)
-            board.flipFieldsAffectedByMove(legalMoveManager.findFieldsFlippedByMove(board, index))
+            board.flipFieldsAffectedByMove(board.legalMoveManager.findFieldsFlippedByMove(board, index))
 
             gameBoardPanel.drawBoard(board)
             board.printBoard()

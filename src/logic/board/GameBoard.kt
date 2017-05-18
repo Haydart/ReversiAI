@@ -1,5 +1,7 @@
 package logic.board
 
+import logic.LegalMoveManager
+
 /**
  * Created by r.makowiecki on 13/05/2017.
  */
@@ -8,6 +10,7 @@ class GameBoard {
     var possibleMoves: Set<Int> = setOf(34, 29, 20, 43)
     var whitePossibleMoves: Set<Int> = emptySet()
     val boardState: GameState = GameState()
+    val legalMoveManager = LegalMoveManager()
 
     init {
         setupInitialFields()

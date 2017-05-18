@@ -1,13 +1,17 @@
 package logic.ai.evaluation
 
-import logic.PlayerTurn
+import logic.ai.evaluation.field_weights.FieldWeightProvider
+import logic.board.FieldState
 import logic.board.GameBoard
 
 /**
  * Created by r.makowiecki on 17/05/2017.
  */
-class OwnershipMobilityEvaluator : Evaluator {
-    override fun evaluate(board: GameBoard, player: PlayerTurn): Int {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+class OwnershipMobilityEvaluator(fieldValueWeights: FieldWeightProvider) : Evaluator {
+    val fieldWeights = fieldValueWeights.getFieldWeights()
+
+    override fun evaluate(board: GameBoard, ownedFieldsType: FieldState) =
+            board.boardState.blackMobility + board.boardStateArray
+                    .filter { it.fieldState === ownedFieldsType }
+                    .sumBy { it.index * fieldWeights[it.index] }
 }
