@@ -13,5 +13,5 @@ class OwnershipMobilityEvaluator(fieldValueWeights: FieldWeightProvider) : Evalu
     override fun evaluate(board: GameBoard, ownedFieldsType: FieldState) =
             board.boardState.blackMobility + board.boardStateArray
                     .filter { it.fieldState === ownedFieldsType }
-                    .sumBy { it.index * fieldWeights[it.index] }
+                    .sumBy { fieldWeights[it.index] }
 }

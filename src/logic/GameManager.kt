@@ -72,6 +72,8 @@ class GameManager : FieldClickListener, BoardUpdateListener {
 
     fun beginAiTurn() {
         println("AI turn began")
+        println("AI evaluated the board for: ${OwnershipEvaluator(StandardFieldWeightProvider()).evaluate(board, FieldState.WHITE)}")
+
         playerTurn = PlayerTurn.WHITE
         board.possibleMoves = board.legalMoveManager.findLegalMoves(board, FieldState.WHITE)
         board.boardState.whiteFieldsCount = board.getSquaresWithState(FieldState.WHITE).size
@@ -118,6 +120,7 @@ class GameManager : FieldClickListener, BoardUpdateListener {
         if (board.possibleMoves.contains(index) && playerTurn === PlayerTurn.BLACK) {
             board.boardStateArray[index].fieldState = FieldState.BLACK
             gameBoardPanel.hidePossibleMoves(board.possibleMoves)
+            println("fields flipped by player move: ${board.legalMoveManager.findFieldsFlippedByMove(board, index)}")
             board.flipFieldsAffectedByMove(board.legalMoveManager.findFieldsFlippedByMove(board, index))
 
             gameBoardPanel.drawBoard(board)

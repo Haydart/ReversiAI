@@ -8,8 +8,16 @@ import logic.board.GameBoard
  * Created by r.makowiecki on 17/05/2017.
  */
 class MinMaxSearcher : Searcher() {
-    override fun search(board: GameBoard, possibleMoves: Set<Int>, depth: Int): Int {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
+    companion object {
+        var boardStatesCount: Int = 0
+    }
+
+    override fun search(board: GameBoard, possibleMoves: Set<Int>, depth: Int, evaluator: Evaluator): Int {
+        val asd = valueMax(board, FieldState.WHITE, depth, evaluator)
+        print("There were $boardStatesCount states visited")
+        boardStatesCount = 0
+        return asd
     }
 
     fun valueMin(board: GameBoard, ownedFieldsType: FieldState, depth: Int, evaluator: Evaluator): Int {
@@ -19,10 +27,15 @@ class MinMaxSearcher : Searcher() {
             return evaluator.evaluate(board, ownedFieldsType)
         }
         val possibleMoves = board.legalMoveManager.findLegalMoves(board, ownedFieldsType)
+        boardStatesCount += possibleMoves.size
 
-        for(fieldIndex in possibleMoves) {
+        for (fieldIndex in possibleMoves) {
             board.boardStateArray[fieldIndex].fieldState = ownedFieldsType
+            val flippedFields = board.legalMoveManager.findFieldsFlippedByMove(board, fieldIndex)
+            board.flipFieldsAffectedByMove(flippedFields)
             val maxValue = valueMax(board, ownedFieldsType.opposite(), depth - 1, evaluator)
+            board.flipFieldsAffectedByMove(flippedFields)
+            board.boardStateArray[fieldIndex].fieldState = FieldState.EMPTY
             if (maxValue < best) {
                 best = maxValue
             }
@@ -37,11 +50,16 @@ class MinMaxSearcher : Searcher() {
             return evaluator.evaluate(board, ownedFieldsType)
         }
         val possibleMoves = board.legalMoveManager.findLegalMoves(board, ownedFieldsType)
+        boardStatesCount += possibleMoves.size
 
-        for(fieldIndex in possibleMoves) {
+        for (fieldIndex in possibleMoves) {
             board.boardStateArray[fieldIndex].fieldState = ownedFieldsType
+            val flippedFields = board.legalMoveManager.findFieldsFlippedByMove(board, fieldIndex)
+            board.flipFieldsAffectedByMove(flippedFields)
             val maxValue = valueMin(board, ownedFieldsType.opposite(), depth - 1, evaluator)
-            if (maxValue < best) {
+            board.flipFieldsAffectedByMove(flippedFields)
+            board.boardStateArray[fieldIndex].fieldState = FieldState.EMPTY
+            if (maxValue > best) {
                 best = maxValue
             }
         }
