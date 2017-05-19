@@ -8,8 +8,7 @@ import logic.LegalMoveManager
 class GameBoard {
     val boardStateArray = Array(64, { BoardField() })
     var possibleMoves: Set<Int> = setOf(34, 29, 20, 43)
-    var whitePossibleMoves: Set<Int> = emptySet()
-    val boardState: GameState = GameState()
+    val gameState: GameState = GameState()
     val legalMoveManager = LegalMoveManager()
 
     init {

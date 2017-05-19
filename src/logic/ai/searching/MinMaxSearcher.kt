@@ -23,7 +23,7 @@ class MinMaxSearcher : Searcher() {
     fun valueMin(board: GameBoard, ownedFieldsType: FieldState, depth: Int, evaluator: Evaluator): Int {
         var best = Integer.MAX_VALUE
 
-        if (depth <= 0 || board.boardState.isEndOfGame()) {
+        if (depth <= 0 || board.gameState.isEndOfGame()) {
             return evaluator.evaluate(board, ownedFieldsType)
         }
         val possibleMoves = board.legalMoveManager.findLegalMoves(board, ownedFieldsType)
@@ -46,7 +46,7 @@ class MinMaxSearcher : Searcher() {
     private fun valueMax(board: GameBoard, ownedFieldsType: FieldState, depth: Int, evaluator: Evaluator): Int {
         var best = Integer.MIN_VALUE
 
-        if (depth <= 0 || board.boardState.isEndOfGame()) {
+        if (depth <= 0 || board.gameState.isEndOfGame()) {
             return evaluator.evaluate(board, ownedFieldsType)
         }
         val possibleMoves = board.legalMoveManager.findLegalMoves(board, ownedFieldsType)

@@ -1,7 +1,8 @@
 package logic
 
 import logic.ai.AiPlayer
-import logic.ai.evaluation.OwnershipEvaluator
+import logic.ai.evaluation.FieldOwnershipEvaluator
+import logic.ai.evaluation.FieldOwnershipMobilityEvaluator
 import logic.ai.evaluation.field_weights.StandardFieldWeightProvider
 import logic.ai.searching.RandomSearcher
 import logic.board.FieldState
@@ -29,10 +30,11 @@ class GameManager : FieldClickListener, BoardUpdateListener {
         private set
     private val board = GameBoard()
     private val gameBoardPanel = GameBoardPanel(cellColor, preferredCellSize, this, this)
-    private val aiPlayer = AiPlayer(RandomSearcher(), OwnershipEvaluator(StandardFieldWeightProvider()), 3, FieldState.WHITE)
+    private val aiPlayer = AiPlayer(RandomSearcher(), FieldOwnershipMobilityEvaluator(StandardFieldWeightProvider()), 3, FieldState.WHITE)
 
     fun startReversiGame() {
         launchGui()
+        beginUserTurn()
     }
 
     private fun launchGui() {
@@ -72,31 +74,31 @@ class GameManager : FieldClickListener, BoardUpdateListener {
 
     fun beginAiTurn() {
         println("AI turn began")
-        println("AI evaluated the board for: ${OwnershipEvaluator(StandardFieldWeightProvider()).evaluate(board, FieldState.WHITE)}")
+        println("AI evaluated the board for: ${FieldOwnershipEvaluator(StandardFieldWeightProvider()).evaluate(board, FieldState.WHITE)}")
 
         playerTurn = PlayerTurn.WHITE
         board.possibleMoves = board.legalMoveManager.findLegalMoves(board, FieldState.WHITE)
-        board.boardState.whiteFieldsCount = board.getSquaresWithState(FieldState.WHITE).size
-        board.boardState.whiteMobility = board.possibleMoves.size
-        board.boardState.blackMobility = board.legalMoveManager.findLegalMoves(board, FieldState.BLACK).size
+        board.gameState.whiteFieldsCount = board.getSquaresWithState(FieldState.WHITE).size
+        board.gameState.whiteMobility = board.possibleMoves.size
+        board.gameState.blackMobility = board.legalMoveManager.findLegalMoves(board, FieldState.BLACK).size
 
-        if (board.boardState.whiteMobility != 0) {
+        if (board.gameState.whiteMobility != 0) {
             val movedField = aiPlayer.performMove(board, board.possibleMoves)
             board.boardStateArray[movedField.first].fieldState = movedField.second
             gameBoardPanel.hidePossibleMoves(board.possibleMoves)
             board.flipFieldsAffectedByMove(board.legalMoveManager.findFieldsFlippedByMove(board, movedField.first))
             board.possibleMoves = board.legalMoveManager.findLegalMoves(board, FieldState.BLACK)
-            board.boardState.whiteFieldsCount = board.getSquaresWithState(FieldState.WHITE).size
-            board.boardState.whiteMobility = board.possibleMoves.size
+            board.gameState.whiteFieldsCount = board.getSquaresWithState(FieldState.WHITE).size
+            board.gameState.whiteMobility = board.possibleMoves.size
             gameBoardPanel.drawBoard(board)
             board.printBoard()
 
             beginUserTurn()
-        } else if (board.boardState.whiteMobility == 0 && !board.boardState.isEndOfGame()) {
+        } else if (board.gameState.whiteMobility == 0 && !board.gameState.isEndOfGame()) {
             println("No moves possible, giving up the turn to BLACK")
             beginUserTurn()
-        } else if (board.boardState.isEndOfGame()) {
-            println(board.boardState.getGameResult())
+        } else if (board.gameState.isEndOfGame()) {
+            println(board.gameState.getGameResult())
         }
     }
 
@@ -104,15 +106,16 @@ class GameManager : FieldClickListener, BoardUpdateListener {
         println("User turn began")
         playerTurn = PlayerTurn.BLACK
         board.possibleMoves = board.legalMoveManager.findLegalMoves(board, FieldState.BLACK)
-        board.boardState.blackFieldsCount = board.getSquaresWithState(FieldState.BLACK).size
-        board.boardState.blackMobility = board.possibleMoves.size
-        board.boardState.whiteMobility = board.legalMoveManager.findLegalMoves(board, FieldState.WHITE).size
+        board.gameState.blackFieldsCount = board.getSquaresWithState(FieldState.BLACK).size
+        board.gameState.blackMobility = board.possibleMoves.size
+        board.gameState.whiteMobility = board.legalMoveManager.findLegalMoves(board, FieldState.WHITE).size
+        gameBoardPanel.showPossibleMoves(board.possibleMoves)
 
-        if (board.boardState.blackMobility == 0) {
+        if (board.gameState.blackMobility == 0) {
             println("No moves possible, giving up the turn to WHITE")
             beginAiTurn()
-        } else if (board.boardState.isEndOfGame()) {
-            println(board.boardState.getGameResult())
+        } else if (board.gameState.isEndOfGame()) {
+            println(board.gameState.getGameResult())
         }
     }
 
