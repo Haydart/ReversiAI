@@ -10,7 +10,7 @@ import logic.board.GameBoard
 class FieldOwnershipMobilityEvaluator(fieldValueWeights: FieldWeightProvider) : Evaluator {
     val fieldWeights = fieldValueWeights.getFieldWeights()
 
-    private val POSESSION_FACTOR_WEIGHT: Float = 0.5f
+    private val POSESSION_FACTOR_WEIGHT: Float = 0.1f
     private val MOBILITY_FACTOR_WEIGHT = 1.5f
 
     override fun evaluate(board: GameBoard, ownedFieldsType: FieldState): Int {

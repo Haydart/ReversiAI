@@ -27,7 +27,7 @@ class GameBoardPanel(cellColor: Color, initialCellSize: Int, fieldClickListener:
                     val newFieldState = fieldClickListener.onFieldClicked(field.index)
                     if(newFieldState != null) {
                         field.fieldState = newFieldState
-                        drawField(field.index, newFieldState)
+                        //drawField(field.index, newFieldState)
                         boardUpdateListener.onBoardUiUpdatedAfterUserMove()
                     }
                 }
