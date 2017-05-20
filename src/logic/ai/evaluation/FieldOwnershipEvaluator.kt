@@ -12,8 +12,8 @@ class FieldOwnershipEvaluator(fieldValueWeights: FieldWeightProvider) : Evaluato
 
     private val POSESSION_FACTOR: Float = 0f
 
-    override fun evaluate(board: GameBoard, ownedFieldsType: FieldState): Int {
+    override fun evaluate(board: GameBoard, ownedFieldsType: FieldState): Float {
         val possessedFieldsIndicesArray = board.boardStateArray.filter { it.fieldState === ownedFieldsType }
-        return (possessedFieldsIndicesArray.size * POSESSION_FACTOR + possessedFieldsIndicesArray.sumBy { fieldWeights[it.index] }).toInt()
+        return (possessedFieldsIndicesArray.size * POSESSION_FACTOR + possessedFieldsIndicesArray.sumBy { fieldWeights[it.index].toInt() })
     }
 }

@@ -1,8 +1,8 @@
 package logic
 
 import logic.ai.AiPlayer
-import logic.ai.evaluation.FieldOwnershipEvaluator
-import logic.ai.evaluation.field_weights.StandardFieldWeightProvider
+import logic.ai.evaluation.CombinedEvaluator
+import logic.ai.evaluation.field_weights.NewFieldWeightProvider
 import logic.ai.searching.MinMaxSearcher
 import logic.board.FieldState
 import logic.board.GameBoard
@@ -29,7 +29,7 @@ class GameManager : FieldClickListener, BoardUpdateListener {
         private set
     private val board = GameBoard()
     private val gameBoardPanel = GameBoardPanel(cellColor, preferredCellSize, this, this)
-    private val aiPlayer = AiPlayer(MinMaxSearcher(), FieldOwnershipEvaluator(StandardFieldWeightProvider()), 3, FieldState.WHITE)
+    private val aiPlayer = AiPlayer(MinMaxSearcher(), CombinedEvaluator(NewFieldWeightProvider()), 1, FieldState.WHITE)
     private val minimalAiTurnDurationMillis = 100L
 
     fun startReversiGame() {

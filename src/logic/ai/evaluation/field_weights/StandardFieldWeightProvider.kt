@@ -5,13 +5,13 @@ package logic.ai.evaluation.field_weights
  */
 class StandardFieldWeightProvider : FieldWeightProvider {
     override fun getFieldWeights() = arrayOf(
-            8,  -2,  3,  3,  3,  3,  -2,  8,
-            -2, -5,  2,  2,  2,  2,  -5, -2,
-            3,   2,  1,  1,  1,  1,   2,  3,
-            3,   2,  1,  1,  1,  1,   2,  3,
-            3,   2,  1,  1,  1,  1,   2,  3,
-            3,   2,  1,  1,  1,  1,   2,  3,
-            -2, -5,  2,  2,  2,  2,  -5, -2,
-            8,  -2,  3,  3,  3,  3,  -2,  8
+            8f,  -2f,  3f,  3f,  3f,  3f,  -2f,  8f,
+            -2f, -5f,  2f,  2f,  2f,  2f,  -5f, -2f,
+            3f,   2f,  1f,  1f,  1f,  1f,   2f,  3f,
+            3f,   2f,  1f,  1f,  1f,  1f,   2f,  3f,
+            3f,   2f,  1f,  1f,  1f,  1f,   2f,  3f,
+            3f,   2f,  1f,  1f,  1f,  1f,   2f,  3f,
+            -2f, -5f,  2f,  2f,  2f,  2f,  -5f, -2f,
+            8f,  -2f,  3f,  3f,  3f,  3f,  -2f,  8f
     )
 }

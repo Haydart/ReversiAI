@@ -19,18 +19,18 @@ class MinMaxSearcher : Searcher() {
         algorithmDepth = depth
         val chosenMove = valueMax(board, FieldState.WHITE, depth, evaluator, -1)
         println("There were $boardStatesCount states visited")
-        println("AI chose move evaluated at: ${chosenMove.first}")
+        println("AI chose move evaluated at: ${chosenMove.first}. Move leading to this state is ${chosenMove.second}")
         boardStatesCount = 0
         return chosenMove.second
     }
 
-    fun valueMin(board: GameBoard, ownedFieldsType: FieldState, depth: Int, evaluator: Evaluator, firstMoveLeadingToCurrentState: Int, tab: String = ""): Pair<Int, Int> {
-        var best = Integer.MAX_VALUE
+    fun valueMin(board: GameBoard, ownedFieldsType: FieldState, depth: Int, evaluator: Evaluator, firstMoveLeadingToCurrentState: Int, tab: String = ""): Pair<Float, Int> {
+        var best = Integer.MAX_VALUE.toFloat()
 
         if (depth <= 0 || board.gameState.isEndOfGame()) {
             val currentBoardValue = evaluator.evaluate(board, ownedFieldsType.opposite())
-            //board.printBoard()
-            println("This board was evaluated for $currentBoardValue")
+            board.printBoard()
+            println("This board was evaluated for $currentBoardValue. Move leading to this state is $firstMoveLeadingToCurrentState")
             return Pair(currentBoardValue, firstMoveLeadingToCurrentState)
         }
         val possibleMoves = board.legalMoveManager.findLegalMoves(board, ownedFieldsType)
@@ -52,16 +52,16 @@ class MinMaxSearcher : Searcher() {
                 best = maxValue.first
             }
         }
-        println("${tab}${tab}Minimal player depth $depth chose: $best")
+        println("${tab}${tab}Minimal player depth $depth chose: $best. Move leading to this state is $firstMoveIndex")
         return Pair(best, firstMoveIndex)
     }
 
-    private fun valueMax(board: GameBoard, ownedFieldsType: FieldState, depth: Int, evaluator: Evaluator, firstMoveLeadingToCurrentState: Int, tab: String = ""): Pair<Int, Int> {
-        var best = Integer.MIN_VALUE
+    private fun valueMax(board: GameBoard, ownedFieldsType: FieldState, depth: Int, evaluator: Evaluator, firstMoveLeadingToCurrentState: Int, tab: String = ""): Pair<Float, Int> {
+        var best = Integer.MIN_VALUE.toFloat()
 
         if (depth <= 0 || board.gameState.isEndOfGame()) {
             val currentBoardValue = evaluator.evaluate(board, ownedFieldsType.opposite())
-            //board.printBoard()
+            board.printBoard()
             println("This board was evaluated for $currentBoardValue")
             return Pair(currentBoardValue, firstMoveLeadingToCurrentState)
         }
@@ -84,7 +84,7 @@ class MinMaxSearcher : Searcher() {
                 best = maxValue.first
             }
         }
-        println("${tab}${tab}Maximal player depth $depth chose: $best")
+        println("${tab}${tab}Maximal player depth $depth chose: $best. Move leading to this state is $firstMoveIndex")
         return Pair(best, firstMoveIndex)
     }
 }
