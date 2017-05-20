@@ -37,6 +37,7 @@ class MinMaxSearcher : Searcher() {
         boardStatesCount += possibleMoves.size
 
         var firstMoveIndex = 0
+        var bestMoveIndex = 0
 
         for (fieldIndex in possibleMoves) {
             println("${tab}Min player moved to: ${Pair(fieldIndex % 8 + 1, fieldIndex / 8 + 1)}")
@@ -50,14 +51,15 @@ class MinMaxSearcher : Searcher() {
             board.boardStateArray[fieldIndex].fieldState = FieldState.EMPTY
             if (maxValue.first < best) {
                 best = maxValue.first
+                bestMoveIndex = maxValue.second
             }
         }
         println("${tab}${tab}Minimal player depth $depth chose: $best. Move leading to this state is $firstMoveIndex")
-        return Pair(best, firstMoveIndex)
+        return Pair(best, bestMoveIndex)
     }
 
     private fun valueMax(board: GameBoard, ownedFieldsType: FieldState, depth: Int, evaluator: Evaluator, firstMoveLeadingToCurrentState: Int, tab: String = ""): Pair<Float, Int> {
-        var best = Integer.MIN_VALUE.toFloat()
+        var bestValue = Integer.MIN_VALUE.toFloat()
 
         if (depth <= 0 || board.gameState.isEndOfGame()) {
             val currentBoardValue = evaluator.evaluate(board, ownedFieldsType.opposite())
@@ -69,6 +71,7 @@ class MinMaxSearcher : Searcher() {
         boardStatesCount += possibleMoves.size
 
         var firstMoveIndex = 0
+        var bestMoveIndex = 0
 
         for (fieldIndex in possibleMoves) {
             println("${tab}Max player moved to: ${Pair(fieldIndex % 8 + 1, fieldIndex / 8 +1)}")
@@ -80,11 +83,12 @@ class MinMaxSearcher : Searcher() {
             val maxValue = valueMin(board, ownedFieldsType.opposite(), depth - 1, evaluator, firstMoveIndex, tab + "    ")
             board.flipFieldsAffectedByMove(flippedFields)
             board.boardStateArray[fieldIndex].fieldState = FieldState.EMPTY
-            if (maxValue.first > best) {
-                best = maxValue.first
+            if (maxValue.first > bestValue) {
+                bestValue = maxValue.first
+                bestMoveIndex = maxValue.second
             }
         }
-        println("${tab}${tab}Maximal player depth $depth chose: $best. Move leading to this state is $firstMoveIndex")
-        return Pair(best, firstMoveIndex)
+        println("${tab}${tab}Maximal player depth $depth chose: $bestValue. Move leading to this state is $firstMoveIndex")
+        return Pair(bestValue, bestMoveIndex)
     }
 }
