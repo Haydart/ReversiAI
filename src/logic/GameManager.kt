@@ -29,7 +29,7 @@ class GameManager : FieldClickListener, BoardUpdateListener {
         private set
     private val board = GameBoard()
     private val gameBoardPanel = GameBoardPanel(cellColor, preferredCellSize, this, this)
-    private val aiPlayer = AiPlayer(MinMaxSearcher(), CombinedEvaluator(NewFieldWeightProvider()), 1, FieldState.WHITE)
+    private val aiPlayer = AiPlayer(MinMaxSearcher(), CombinedEvaluator(NewFieldWeightProvider()), 3, FieldState.WHITE)
     private val minimalAiTurnDurationMillis = 100L
 
     fun startReversiGame() {
