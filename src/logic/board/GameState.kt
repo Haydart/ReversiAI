@@ -21,4 +21,11 @@ class GameState {
         else if (isEndOfGame() && blackFieldsCount < whiteFieldsCount) return  GameResult.WHITE_WINS
         else return null
     }
+
+    fun recalculate(board: GameBoard) {
+        blackFieldsCount = board.boardStateArray.filter { it.fieldState === FieldState.BLACK }.count()
+        whiteFieldsCount = board.boardStateArray.filter { it.fieldState === FieldState.WHITE }.count()
+        blackMobility = board.legalMoveManager.findLegalMoves(board, FieldState.BLACK).size
+        whiteMobility = board.legalMoveManager.findLegalMoves(board, FieldState.WHITE).size
+    }
 }

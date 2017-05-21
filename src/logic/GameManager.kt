@@ -30,7 +30,6 @@ class GameManager : FieldClickListener, BoardUpdateListener {
     private val board = GameBoard()
     private val gameBoardPanel = GameBoardPanel(cellColor, preferredCellSize, this, this)
     private val aiPlayer = AiPlayer(MinMaxSearcher(), CombinedEvaluator(NewFieldWeightProvider()), 3, FieldState.WHITE)
-    private val minimalAiTurnDurationMillis = 100L
 
     fun startReversiGame() {
         launchGui()
@@ -83,9 +82,13 @@ class GameManager : FieldClickListener, BoardUpdateListener {
         if (board.gameState.whiteMobility != 0) {
             object : Thread() {
                 override fun run() {
-                    Thread.sleep(minimalAiTurnDurationMillis)
+                    println("Possible AI moves are ${board.possibleMoves}")
+                   // Thread.sleep(minimalAiTurnDurationMillis)
+
                     val moveFieldIndex = aiPlayer.performMove(board, board.possibleMoves)
                     board.boardStateArray[moveFieldIndex.first].fieldState = moveFieldIndex.second
+                    println("AI chose move to ${moveFieldIndex.first}")
+
                     gameBoardPanel.hidePossibleMoves(board.possibleMoves)
                     board.flipFieldsAffectedByMove(board.legalMoveManager.findFieldsFlippedByMove(board, moveFieldIndex.first))
                     board.possibleMoves = board.legalMoveManager.findLegalMoves(board, FieldState.BLACK)
@@ -93,7 +96,7 @@ class GameManager : FieldClickListener, BoardUpdateListener {
                     board.gameState.whiteMobility = board.possibleMoves.size
 
                     gameBoardPanel.drawBoard(board)
-                    board.printBoard()
+                    //board.printBoard()
 
                     beginUserTurn()
                     this.interrupt()
@@ -129,11 +132,11 @@ class GameManager : FieldClickListener, BoardUpdateListener {
         if (board.possibleMoves.contains(index) && playerTurn === PlayerTurn.BLACK) {
             board.boardStateArray[index].fieldState = FieldState.BLACK
             gameBoardPanel.hidePossibleMoves(board.possibleMoves)
-            println("fields flipped by player move: ${board.legalMoveManager.findFieldsFlippedByMove(board, index)}")
+            //println("fields flipped by player move: ${board.legalMoveManager.findFieldsFlippedByMove(board, index)}")
             board.flipFieldsAffectedByMove(board.legalMoveManager.findFieldsFlippedByMove(board, index))
 
             gameBoardPanel.drawBoard(board)
-            board.printBoard()
+            //board.printBoard()
 
             return FieldState.BLACK
         }

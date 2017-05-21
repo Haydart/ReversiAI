@@ -1,5 +1,6 @@
 package logic.ai.searching
 
+import logic.GameResult
 import logic.ai.evaluation.Evaluator
 import logic.board.FieldState
 import logic.board.GameBoard
@@ -17,78 +18,143 @@ class MinMaxSearcher : Searcher() {
 
     override fun searchBestMove(board: GameBoard, possibleMoves: Set<Int>, depth: Int, evaluator: Evaluator): Int {
         algorithmDepth = depth
-        val chosenMove = valueMax(board, FieldState.WHITE, depth, evaluator, -1)
-        println("There were $boardStatesCount states visited")
+        val chosenMove = valueMax(board, depth, evaluator, -1)
         println("AI chose move evaluated at: ${chosenMove.first}. Move leading to this state is ${chosenMove.second}")
         boardStatesCount = 0
         return chosenMove.second
     }
 
-    fun valueMin(board: GameBoard, ownedFieldsType: FieldState, depth: Int, evaluator: Evaluator, firstMoveLeadingToCurrentState: Int, tab: String = ""): Pair<Float, Int> {
-        var best = Integer.MAX_VALUE.toFloat()
+    // max player is always white in this implementation
+    private fun valueMax(board: GameBoard, depth: Int, evaluator: Evaluator, firstMoveLeadingToCurrentState: Int, tab: String = ""): Pair<Float, Int> {
+        var bestValue = Integer.MIN_VALUE.toFloat()
 
-        if (depth <= 0 || board.gameState.isEndOfGame()) {
-            val currentBoardValue = evaluator.evaluate(board, ownedFieldsType.opposite())
+        if(depth <= 0) {
+            val currentBoardValue = evaluator.evaluate(board, FieldState.WHITE) //always evaluate from the same perspective
+            println()
             board.printBoard()
             println("This board was evaluated for $currentBoardValue. Move leading to this state is $firstMoveLeadingToCurrentState")
             return Pair(currentBoardValue, firstMoveLeadingToCurrentState)
         }
-        val possibleMoves = board.legalMoveManager.findLegalMoves(board, ownedFieldsType)
-        boardStatesCount += possibleMoves.size
 
-        var firstMoveIndex = 0
-        var bestMoveIndex = 0
+        board.gameState.recalculate(board)
+        if(board.gameState.isEndOfGame()) {
+            val gameResultValue = if(board.gameState.getGameResult() === GameResult.WHITE_WINS) Integer.MAX_VALUE.toFloat() else bestValue
+            println("End of game tree reached with result $gameResultValue")
+            return Pair(gameResultValue, firstMoveLeadingToCurrentState)
+        }
 
-        for (fieldIndex in possibleMoves) {
-            println("${tab}Min player moved to: ${Pair(fieldIndex % 8 + 1, fieldIndex / 8 + 1)}")
-            board.boardStateArray[fieldIndex].fieldState = ownedFieldsType
-            val flippedFields = board.legalMoveManager.findFieldsFlippedByMove(board, fieldIndex)
-            board.flipFieldsAffectedByMove(flippedFields)
+        var firstMoveIndex: Int
+        var bestMoveIndex = -1
 
-            firstMoveIndex = if (depth == algorithmDepth) fieldIndex else firstMoveLeadingToCurrentState
-            val maxValue = valueMax(board, ownedFieldsType.opposite(), depth - 1, evaluator, firstMoveIndex, tab + "    ")
-            board.flipFieldsAffectedByMove(flippedFields)
-            board.boardStateArray[fieldIndex].fieldState = FieldState.EMPTY
-            if (maxValue.first < best) {
-                best = maxValue.first
-                bestMoveIndex = maxValue.second
+        val whitePossibleMoves = board.legalMoveManager.findLegalMoves(board, FieldState.WHITE)
+
+        if(whitePossibleMoves.isNotEmpty()) {
+            for (fieldIndex in whitePossibleMoves) {
+                board.boardStateArray[fieldIndex].fieldState = FieldState.WHITE
+                val flippedFields = board.legalMoveManager.findFieldsFlippedByMove(board, fieldIndex)
+                board.flipFieldsAffectedByMove(flippedFields)
+
+                firstMoveIndex = if (depth == algorithmDepth) fieldIndex else firstMoveLeadingToCurrentState
+
+                val maxValue = valueMin(board, depth - 1, evaluator, firstMoveIndex, tab + "    ")
+                board.flipFieldsAffectedByMove(flippedFields)
+                board.boardStateArray[fieldIndex].fieldState = FieldState.EMPTY
+                if (maxValue.first >= bestValue) {
+                    bestValue = maxValue.first
+                    bestMoveIndex = maxValue.second
+                }
+            }
+        } else {
+            val opponentPossibleMoves = board.legalMoveManager.findLegalMoves(board, FieldState.BLACK)
+
+            for (fieldIndex in opponentPossibleMoves) {
+                board.boardStateArray[fieldIndex].fieldState = FieldState.BLACK
+                val flippedFields = board.legalMoveManager.findFieldsFlippedByMove(board, fieldIndex)
+                board.flipFieldsAffectedByMove(flippedFields)
+
+                firstMoveIndex = if (depth == algorithmDepth) fieldIndex else firstMoveLeadingToCurrentState
+                val maxValue = valueMax(board, depth, evaluator, firstMoveIndex, tab + "    ")
+                board.flipFieldsAffectedByMove(flippedFields)
+                board.boardStateArray[fieldIndex].fieldState = FieldState.EMPTY
+                if (maxValue.first >= bestValue) {
+                    bestValue = maxValue.first
+                    bestMoveIndex = maxValue.second
+                }
             }
         }
-        println("${tab}${tab}Minimal player depth $depth chose: $best. Move leading to this state is $firstMoveIndex")
-        return Pair(best, bestMoveIndex)
+        return Pair(bestValue, bestMoveIndex)
     }
 
-    private fun valueMax(board: GameBoard, ownedFieldsType: FieldState, depth: Int, evaluator: Evaluator, firstMoveLeadingToCurrentState: Int, tab: String = ""): Pair<Float, Int> {
-        var bestValue = Integer.MIN_VALUE.toFloat()
+    //minimum player is always black in this implementation
+    fun valueMin(board: GameBoard, depth: Int, evaluator: Evaluator, firstMoveLeadingToCurrentState: Int, tab: String = ""): Pair<Float, Int> {
+        var bestValue = Integer.MAX_VALUE.toFloat()
 
-        if (depth <= 0 || board.gameState.isEndOfGame()) {
-            val currentBoardValue = evaluator.evaluate(board, ownedFieldsType.opposite())
+        if(depth <= 0) {
+            val currentBoardValue = evaluator.evaluate(board, FieldState.WHITE) //always evaluate from the same perspective
+            println()
             board.printBoard()
-            println("This board was evaluated for $currentBoardValue")
+            println("This board was evaluated for $currentBoardValue. Move leading to this state is $firstMoveLeadingToCurrentState")
             return Pair(currentBoardValue, firstMoveLeadingToCurrentState)
         }
-        val possibleMoves = board.legalMoveManager.findLegalMoves(board, ownedFieldsType)
-        boardStatesCount += possibleMoves.size
+        board.gameState.recalculate(board)
+        if(board.gameState.isEndOfGame()) {
+            val gameResultValue = if(board.gameState.getGameResult() === GameResult.BLACK_WINS) Integer.MIN_VALUE.toFloat() else bestValue
+            println("End of game tree reached with result $gameResultValue")
+            return Pair(gameResultValue, firstMoveLeadingToCurrentState)
+        }
 
-        var firstMoveIndex = 0
-        var bestMoveIndex = 0
+        var firstMoveIndex : Int
+        var bestMoveIndex = -1
 
-        for (fieldIndex in possibleMoves) {
-            println("${tab}Max player moved to: ${Pair(fieldIndex % 8 + 1, fieldIndex / 8 +1)}")
-            board.boardStateArray[fieldIndex].fieldState = ownedFieldsType
-            val flippedFields = board.legalMoveManager.findFieldsFlippedByMove(board, fieldIndex)
-            board.flipFieldsAffectedByMove(flippedFields)
+        val blackPossibleMoves = board.legalMoveManager.findLegalMoves(board, FieldState.BLACK)
 
-            firstMoveIndex = if (depth == algorithmDepth) fieldIndex else firstMoveLeadingToCurrentState
-            val maxValue = valueMin(board, ownedFieldsType.opposite(), depth - 1, evaluator, firstMoveIndex, tab + "    ")
-            board.flipFieldsAffectedByMove(flippedFields)
-            board.boardStateArray[fieldIndex].fieldState = FieldState.EMPTY
-            if (maxValue.first > bestValue) {
-                bestValue = maxValue.first
-                bestMoveIndex = maxValue.second
+        if(blackPossibleMoves.isNotEmpty()) {
+            for (fieldIndex in blackPossibleMoves) {
+                board.boardStateArray[fieldIndex].fieldState = FieldState.BLACK
+                val flippedFields = board.legalMoveManager.findFieldsFlippedByMove(board, fieldIndex)
+                board.flipFieldsAffectedByMove(flippedFields)
+
+                firstMoveIndex = if (depth == algorithmDepth) fieldIndex else firstMoveLeadingToCurrentState
+                val maxValue = valueMax(board, depth - 1, evaluator, firstMoveIndex, tab + "    ")
+                board.flipFieldsAffectedByMove(flippedFields)
+                board.boardStateArray[fieldIndex].fieldState = FieldState.EMPTY
+                if (maxValue.first <= bestValue) {
+                    bestValue = maxValue.first
+                    bestMoveIndex = maxValue.second
+                }
+            }
+        } else {
+            val whitePossibleMoves = board.legalMoveManager.findLegalMoves(board, FieldState.WHITE)
+
+            for (fieldIndex in whitePossibleMoves) {
+                board.boardStateArray[fieldIndex].fieldState = FieldState.WHITE
+                val flippedFields = board.legalMoveManager.findFieldsFlippedByMove(board, fieldIndex)
+                board.flipFieldsAffectedByMove(flippedFields)
+
+                firstMoveIndex = if (depth == algorithmDepth) fieldIndex else firstMoveLeadingToCurrentState
+                val maxValue = valueMin(board, depth, evaluator, firstMoveIndex, tab + "    ")
+                board.flipFieldsAffectedByMove(flippedFields)
+                board.boardStateArray[fieldIndex].fieldState = FieldState.EMPTY
+                if (maxValue.first <= bestValue) {
+                    bestValue = maxValue.first
+                    bestMoveIndex = maxValue.second
+                }
             }
         }
-        println("${tab}${tab}Maximal player depth $depth chose: $bestValue. Move leading to this state is $firstMoveIndex")
         return Pair(bestValue, bestMoveIndex)
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
