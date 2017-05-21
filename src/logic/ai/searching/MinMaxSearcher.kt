@@ -19,7 +19,7 @@ class MinMaxSearcher : Searcher() {
     override fun searchBestMove(board: GameBoard, possibleMoves: Set<Int>, depth: Int, evaluator: Evaluator): Int {
         algorithmDepth = depth
         val chosenMove = valueMax(board, depth, evaluator, -1)
-        println("AI chose move evaluated at: ${chosenMove.first}. Move leading to this state is ${chosenMove.second}")
+        println("       AI chose move evaluated at: ${chosenMove.first}. Move leading to this state is ${chosenMove.second}")
         boardStatesCount = 0
         return chosenMove.second
     }
@@ -30,16 +30,15 @@ class MinMaxSearcher : Searcher() {
 
         if(depth <= 0) {
             val currentBoardValue = evaluator.evaluate(board, FieldState.WHITE) //always evaluate from the same perspective
-            println()
-            board.printBoard()
-            println("This board was evaluated for $currentBoardValue. Move leading to this state is $firstMoveLeadingToCurrentState")
+//            println()
+//            board.printBoard()
+//            println("This board was evaluated for $currentBoardValue. Move leading to this state is $firstMoveLeadingToCurrentState")
             return Pair(currentBoardValue, firstMoveLeadingToCurrentState)
         }
 
         board.gameState.recalculate(board)
         if(board.gameState.isEndOfGame()) {
             val gameResultValue = if(board.gameState.getGameResult() === GameResult.WHITE_WINS) Integer.MAX_VALUE.toFloat() else bestValue
-            println("End of game tree reached with result $gameResultValue")
             return Pair(gameResultValue, firstMoveLeadingToCurrentState)
         }
 
@@ -91,15 +90,14 @@ class MinMaxSearcher : Searcher() {
 
         if(depth <= 0) {
             val currentBoardValue = evaluator.evaluate(board, FieldState.WHITE) //always evaluate from the same perspective
-            println()
-            board.printBoard()
-            println("This board was evaluated for $currentBoardValue. Move leading to this state is $firstMoveLeadingToCurrentState")
+//            println()
+//            board.printBoard()
+//            println("This board was evaluated for $currentBoardValue. Move leading to this state is $firstMoveLeadingToCurrentState")
             return Pair(currentBoardValue, firstMoveLeadingToCurrentState)
         }
         board.gameState.recalculate(board)
         if(board.gameState.isEndOfGame()) {
             val gameResultValue = if(board.gameState.getGameResult() === GameResult.BLACK_WINS) Integer.MIN_VALUE.toFloat() else bestValue
-            println("End of game tree reached with result $gameResultValue")
             return Pair(gameResultValue, firstMoveLeadingToCurrentState)
         }
 

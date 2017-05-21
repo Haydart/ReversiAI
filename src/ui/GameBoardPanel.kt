@@ -23,11 +23,9 @@ class GameBoardPanel(cellColor: Color, initialCellSize: Int, fieldClickListener:
             field.addMouseListener(object : MouseListenerAdapter() {
                 override fun mouseClicked(e: MouseEvent?) {
                     super.mouseClicked(e)
-                    //println("Clicked field $index")
                     val newFieldState = fieldClickListener.onFieldClicked(field.index)
                     if(newFieldState != null) {
                         field.fieldState = newFieldState
-                        //drawField(field.index, newFieldState)
                         boardUpdateListener.onBoardUiUpdatedAfterUserMove()
                     }
                 }

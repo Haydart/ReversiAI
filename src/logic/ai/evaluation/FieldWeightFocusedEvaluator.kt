@@ -9,7 +9,7 @@ import logic.board.GameBoard
  * Thanks to Kartik Kukreja
  * https://github.com/kartikkukreja/blog-codes/blob/master/src/Heuristic%20Function%20for%20Reversi%20(Othello).cpp
  */
-class CornerFocusedCombinedEvaluator(fieldValueWeights: FieldWeightProvider) : Evaluator {
+class FieldWeightFocusedEvaluator(fieldValueWeights: FieldWeightProvider) : Evaluator {
     val fieldWeights = fieldValueWeights.getFieldWeights()
 
     override fun evaluate(board: GameBoard, ownedFieldsType: FieldState): Float {
@@ -117,7 +117,7 @@ class CornerFocusedCombinedEvaluator(fieldValueWeights: FieldWeightProvider) : E
             if (board.boardStateArray[cornerTilesIndices[3]-1].fieldState == ownedFieldsType) ownDangeredCornerCloseTilesCount++
             else if (board.boardStateArray[cornerTilesIndices[3]-1].fieldState === ownedFieldsType.opposite()) opponentDangeredCornerCloseTilesCount++
         }
-        cornerClosenessPenaltyFactor = -100f * (ownDangeredCornerCloseTilesCount - opponentDangeredCornerCloseTilesCount)
+        cornerClosenessPenaltyFactor = -12.5f * (ownDangeredCornerCloseTilesCount - opponentDangeredCornerCloseTilesCount)
 
 
         // Mobility factor
@@ -131,9 +131,9 @@ class CornerFocusedCombinedEvaluator(fieldValueWeights: FieldWeightProvider) : E
 
 
         //overall board state score
-        val score = (10f * tilesPossessionFactor) + (1602.948f * cornerPossessionFactor) +
+        val score = (10f * tilesPossessionFactor) + (801.724f * cornerPossessionFactor) +
                 (382.026f * cornerClosenessPenaltyFactor) + (78.922f * playerMobilityFactor) +
-                (74.396f * frontierTilesPossessionPenaltyFactor) + (10f * weightedTilesPossessionFactor)
+                (74.396f * frontierTilesPossessionPenaltyFactor) + (1000f * weightedTilesPossessionFactor)
         return score
     }
 }
