@@ -63,7 +63,7 @@ class GameManager : FieldClickListener, BoardUpdateListener {
         board.gameState.whiteMobility = board.possibleMoves.size
         board.gameState.blackMobility = board.legalMoveManager.findLegalMoves(board, FieldState.BLACK).size
 
-        gameStatePanel.updateState(board.gameState.blackFieldsCount, board.gameState.whiteFieldsCount, "white turn")
+        updateGameStatePanel()
 
         if (board.gameState.whiteMobility != 0) {
             object : Thread() {
@@ -95,13 +95,17 @@ class GameManager : FieldClickListener, BoardUpdateListener {
         board.gameState.whiteMobility = board.legalMoveManager.findLegalMoves(board, FieldState.WHITE).size
         gameBoardPanel.showPossibleMoves(board.possibleMoves)
 
-        gameStatePanel.updateState(board.gameState.blackFieldsCount, board.gameState.whiteFieldsCount, "black turn")
+        updateGameStatePanel()
 
         if (board.gameState.blackMobility == 0) {
             beginAiTurn()
         } else if (board.gameState.isEndOfGame()) {
             printEndGameState()
         }
+    }
+
+    private fun updateGameStatePanel() {
+        gameStatePanel.updateState(board.gameState.blackFieldsCount, board.gameState.whiteFieldsCount, playerTurn.toString())
     }
 
     private fun printEndGameState() {

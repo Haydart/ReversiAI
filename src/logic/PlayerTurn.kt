@@ -8,9 +8,11 @@ import java.awt.Color
 enum class PlayerTurn {
     BLACK {
         override fun getFieldBackgroundColor(): Color = Color.BLACK
+        override fun toString() = "Black turn"
     },
     WHITE {
         override fun getFieldBackgroundColor(): Color = Color.WHITE
+        override fun toString() = "White turn"
     };
 
     abstract fun getFieldBackgroundColor() : Color

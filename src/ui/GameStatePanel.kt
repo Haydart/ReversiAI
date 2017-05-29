@@ -31,6 +31,8 @@ class GameStatePanel : JPanel() {
     }
 
     fun updateState(blackCount: Int = this.blackCount, whiteCount: Int = this.whiteCount, gameStateMessage: String) {
+        this.blackCount = blackCount
+        this.whiteCount = whiteCount
         blackCountLabel.text = "Black fields: " + blackCount
         whiteCountLabel.text = "White fields: " + whiteCount
         this.gameStateLabel.text = gameStateMessage
