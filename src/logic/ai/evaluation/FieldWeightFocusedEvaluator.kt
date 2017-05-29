@@ -73,14 +73,12 @@ class FieldWeightFocusedEvaluator(fieldValueWeights: FieldWeightProvider) : Eval
             frontierTilesPossessionPenaltyFactor = ((100.0f * opponentFrontierTiles) / (ownFrontierTiles + opponentFrontierTiles))
         else frontierTilesPossessionPenaltyFactor = 0f
 
-
         // Corner possession factor
         for (i in 0 until cornerTilesIndices.size) {
             if (board.boardStateArray[cornerTilesIndices[i]].fieldState === ownedFieldsType) ownCornerTilesCount++
             else if (board.boardStateArray[cornerTilesIndices[i]].fieldState === ownedFieldsType.opposite()) opponentCornerTilesCount++
         }
         cornerPossessionFactor = 25f * (ownCornerTilesCount - opponentCornerTilesCount)
-
 
         // Corner closeness penalty
         var ownDangeredCornerCloseTilesCount = 0
@@ -131,8 +129,8 @@ class FieldWeightFocusedEvaluator(fieldValueWeights: FieldWeightProvider) : Eval
 
 
         //overall board state score
-        val score = (10f * tilesPossessionFactor) + (801.724f * cornerPossessionFactor) +
-                (382.026f * cornerClosenessPenaltyFactor) + (78.922f * playerMobilityFactor) +
+        val score = (10f * tilesPossessionFactor) + (400.724f * cornerPossessionFactor) +
+                (200.026f * cornerClosenessPenaltyFactor) + (78.922f * playerMobilityFactor) +
                 (74.396f * frontierTilesPossessionPenaltyFactor) + (1000f * weightedTilesPossessionFactor)
         return score
     }

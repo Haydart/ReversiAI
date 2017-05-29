@@ -1,22 +1,16 @@
 package logic
 
 import logic.ai.AiPlayer
-import logic.ai.evaluation.CornerFocusedCombinedEvaluator
-import logic.ai.evaluation.MobilityRestrictingCombinedEvaluator
+import logic.ai.evaluation.FieldWeightFocusedEvaluator
 import logic.ai.evaluation.field_weights.NewFieldWeightProvider
 import logic.ai.searching.MinMaxSearcher
 import logic.board.FieldState
 import logic.board.GameBoard
-import ui.BoardUpdateListener
-import ui.FieldClickListener
-import ui.GameBoardPanel
-import ui.MouseListenerAdapter
+import ui.*
 import java.awt.Color
 import java.awt.Dimension
 import java.awt.EventQueue
 import java.awt.FlowLayout
-import java.awt.event.MouseEvent
-import javax.swing.JButton
 import javax.swing.JFrame
 import javax.swing.UIManager
 
@@ -30,7 +24,8 @@ class GameManager : FieldClickListener, BoardUpdateListener {
         private set
     private val board = GameBoard()
     private val gameBoardPanel = GameBoardPanel(cellColor, preferredCellSize, this, this)
-    private val aiPlayer = AiPlayer(MinMaxSearcher(), MobilityRestrictingCombinedEvaluator(NewFieldWeightProvider()), 5, FieldState.WHITE)
+    private val gameStatePanel = GameStatePanel()
+    private val aiPlayer = AiPlayer(MinMaxSearcher(), FieldWeightFocusedEvaluator(NewFieldWeightProvider()), 5, FieldState.WHITE)
 
     fun startReversiGame() {
         launchGui()
@@ -43,24 +38,13 @@ class GameManager : FieldClickListener, BoardUpdateListener {
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
             } catch (ex: Exception) {
             }
-
-            val findButton = JButton("Find legal moves")
-            findButton.addMouseListener(object : MouseListenerAdapter() {
-                override fun mouseClicked(e: MouseEvent?) {
-                    super.mouseClicked(e)
-                    gameBoardPanel.showPossibleMoves(board.possibleMoves)
-                }
-            })
-            val resetButton = JButton("Reset board")
-
             val frame = JFrame("Reversi")
             frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
             frame.layout = FlowLayout()
             frame.preferredSize = Dimension(750, 750)
             frame.minimumSize = Dimension(700, 750)
             frame.add(gameBoardPanel)
-            frame.add(findButton)
-            frame.add(resetButton)
+            frame.add(gameStatePanel)
             frame.pack()
             frame.setLocationRelativeTo(null)
             frame.isVisible = true
@@ -73,12 +57,13 @@ class GameManager : FieldClickListener, BoardUpdateListener {
     }
 
     fun beginAiTurn() {
-        //println("AI turn began")
         playerTurn = PlayerTurn.WHITE
         board.possibleMoves = board.legalMoveManager.findLegalMoves(board, FieldState.WHITE)
         board.gameState.whiteFieldsCount = board.getSquaresWithState(FieldState.WHITE).size
         board.gameState.whiteMobility = board.possibleMoves.size
         board.gameState.blackMobility = board.legalMoveManager.findLegalMoves(board, FieldState.BLACK).size
+
+        gameStatePanel.updateState(board.gameState.blackFieldsCount, board.gameState.whiteFieldsCount, "white turn")
 
         if (board.gameState.whiteMobility != 0) {
             object : Thread() {
@@ -98,9 +83,8 @@ class GameManager : FieldClickListener, BoardUpdateListener {
         } else if (board.gameState.whiteMobility == 0 && !board.gameState.isEndOfGame()) {
             beginUserTurn()
         } else if (board.gameState.isEndOfGame()) {
-            println(board.gameState.getGameResult())
+            printEndGameState()
         }
-
     }
 
     fun beginUserTurn() {
@@ -111,11 +95,19 @@ class GameManager : FieldClickListener, BoardUpdateListener {
         board.gameState.whiteMobility = board.legalMoveManager.findLegalMoves(board, FieldState.WHITE).size
         gameBoardPanel.showPossibleMoves(board.possibleMoves)
 
+        gameStatePanel.updateState(board.gameState.blackFieldsCount, board.gameState.whiteFieldsCount, "black turn")
+
         if (board.gameState.blackMobility == 0) {
             beginAiTurn()
         } else if (board.gameState.isEndOfGame()) {
-            println(board.gameState.getGameResult())
+            printEndGameState()
         }
+    }
+
+    private fun printEndGameState() {
+        val gameResult = board.gameState.getGameResult()
+        println(gameResult)
+        gameStatePanel.updateState(gameStateMessage = gameResult.toString())
     }
 
     override fun onFieldClicked(index: Int): FieldState? {
