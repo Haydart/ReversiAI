@@ -38,6 +38,7 @@ class GameBoard {
                     else "- "
             )
         }
+        println()
     }
 
     fun flipFieldsAffectedByMove(fieldsToFlip: Set<Int>) {

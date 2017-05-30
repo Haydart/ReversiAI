@@ -4,9 +4,11 @@ import logic.ai.AiPlayer
 import logic.ai.evaluation.FieldWeightFocusedEvaluator
 import logic.ai.evaluation.field_weights.StandardFieldWeightProvider
 import logic.ai.searching.MinMaxSearcher
+import logic.ai.searching.RandomSearcher
 import logic.board.FieldState
 import logic.board.GameBoard
 import ui.BoardUpdateListener
+import ui.FieldClickListener
 import ui.GameBoardPanel
 import ui.GameStatePanel
 import java.awt.Color
@@ -19,18 +21,22 @@ import javax.swing.UIManager
 /**
  * Created by r.makowiecki on 12/05/2017.
  */
-class GameManager : BoardUpdateListener, MoveCompletedCallback {
+class GameManager : BoardUpdateListener, MoveCompletedCallback, FieldClickListener {
+    override fun onFieldClicked(index: Int): FieldState? {
+        //no-op
+        return null
+    }
 
     private val preferredCellSize = 80
     private val cellColor = Color(61, 168, 3)
     var playerTurn: PlayerTurn = PlayerTurn.BLACK
         private set
 
-    private val blackPlayer = HumanPlayer(this, FieldState.BLACK)
+    private val blackPlayer = AiPlayer(RandomSearcher(), FieldWeightFocusedEvaluator(StandardFieldWeightProvider()), 1, FieldState.BLACK, this)
     private val whitePlayer = AiPlayer(MinMaxSearcher(), FieldWeightFocusedEvaluator(StandardFieldWeightProvider()), 5, FieldState.WHITE, this)
 
     private val board = GameBoard()
-    private val gameBoardPanel = GameBoardPanel(cellColor, preferredCellSize, blackPlayer, this)
+    private val gameBoardPanel = GameBoardPanel(cellColor, preferredCellSize, this, this)
     private val gameStatePanel = GameStatePanel()
 
     fun startReversiGame() {
@@ -65,7 +71,6 @@ class GameManager : BoardUpdateListener, MoveCompletedCallback {
     fun beginWhiteTurn() {
         playerTurn = PlayerTurn.WHITE
         board.possibleMoves = board.legalMoveManager.findLegalMoves(board, FieldState.WHITE)
-        board.gameState.whiteFieldsCount = board.getSquaresWithState(FieldState.WHITE).size
         board.gameState.whiteMobility = board.possibleMoves.size
         board.gameState.blackMobility = board.legalMoveManager.findLegalMoves(board, FieldState.BLACK).size
 
@@ -81,7 +86,6 @@ class GameManager : BoardUpdateListener, MoveCompletedCallback {
     fun beginBlackTurn() {
         playerTurn = PlayerTurn.BLACK
         board.possibleMoves = board.legalMoveManager.findLegalMoves(board, FieldState.BLACK)
-        board.gameState.blackFieldsCount = board.getSquaresWithState(FieldState.BLACK).size
         board.gameState.blackMobility = board.possibleMoves.size
         board.gameState.whiteMobility = board.legalMoveManager.findLegalMoves(board, FieldState.WHITE).size
         gameBoardPanel.showPossibleMoves(board.possibleMoves)
@@ -99,6 +103,10 @@ class GameManager : BoardUpdateListener, MoveCompletedCallback {
         board.boardStateArray[index].fieldState = fieldState
         gameBoardPanel.hidePossibleMoves(board.possibleMoves)
         board.flipFieldsAffectedByMove(board.legalMoveManager.findFieldsFlippedByMove(board, index))
+
+        board.gameState.blackFieldsCount = board.getSquaresWithState(FieldState.BLACK).size
+        board.gameState.whiteFieldsCount = board.getSquaresWithState(FieldState.WHITE).size
+
         gameBoardPanel.drawBoard(board)
         board.printBoard()
 
