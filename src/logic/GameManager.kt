@@ -1,8 +1,11 @@
 package logic
 
 import logic.ai.AiPlayer
+import logic.ai.evaluation.CornerFocusedCombinedEvaluator
 import logic.ai.evaluation.FieldOwnershipEvaluator
 import logic.ai.evaluation.FieldWeightFocusedEvaluator
+import logic.ai.evaluation.MobilityRestrictingCombinedEvaluator
+import logic.ai.evaluation.field_weights.NewFieldWeightProvider
 import logic.ai.evaluation.field_weights.StandardFieldWeightProvider
 import logic.ai.searching.MinMaxSearcher
 import logic.ai.searching.RandomSearcher
@@ -33,8 +36,8 @@ class GameManager : BoardUpdateListener, MoveCompletedCallback, FieldClickListen
     var playerTurn: PlayerTurn = PlayerTurn.BLACK
         private set
 
-    private val blackPlayer = AiPlayer(MinMaxSearcher(), FieldOwnershipEvaluator(StandardFieldWeightProvider()), 1, FieldState.BLACK, this)
-    private val whitePlayer = AiPlayer(MinMaxSearcher(), FieldWeightFocusedEvaluator(StandardFieldWeightProvider()), 5, FieldState.WHITE, this)
+    private val blackPlayer = AiPlayer(MinMaxSearcher(), FieldWeightFocusedEvaluator(StandardFieldWeightProvider()), 6, FieldState.BLACK, this)
+    private val whitePlayer = AiPlayer(MinMaxSearcher(), MobilityRestrictingCombinedEvaluator(NewFieldWeightProvider()), 4, FieldState.WHITE, this)
 
     private val board = GameBoard()
     private val gameBoardPanel = GameBoardPanel(cellColor, preferredCellSize, this, this)

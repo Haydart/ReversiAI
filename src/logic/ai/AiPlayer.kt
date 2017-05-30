@@ -17,7 +17,9 @@ class AiPlayer(searcher: Searcher, evaluator: Evaluator, depth: Int, ownedFields
     val depth = depth
 
     override fun performMove(board: GameBoard, possibleMoves: Set<Int>) {
+        val startTime = System.currentTimeMillis()
         val moveResultPair = Pair(searcher.searchBestMove(board, ownedFieldsType, depth, evaluator), ownedFieldsType)
+        Thread.sleep(Math.max(startTime - System.currentTimeMillis() + 500, 0))
         moveCompletedCallback.onPlayerMoved(moveResultPair.first, moveResultPair.second)
     }
 }
