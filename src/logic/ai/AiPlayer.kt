@@ -17,7 +17,7 @@ class AiPlayer(searcher: Searcher, evaluator: Evaluator, depth: Int, ownedFields
     val depth = depth
 
     override fun performMove(board: GameBoard, possibleMoves: Set<Int>) {
-        val moveResultPair = Pair(searcher.searchBestMove(board, possibleMoves, depth, evaluator), ownedFieldsType)
+        val moveResultPair = Pair(searcher.searchBestMove(board, ownedFieldsType, depth, evaluator), ownedFieldsType)
         moveCompletedCallback.onPlayerMoved(moveResultPair.first, moveResultPair.second)
     }
 }

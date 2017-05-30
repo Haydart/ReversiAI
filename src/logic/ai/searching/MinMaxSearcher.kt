@@ -16,15 +16,15 @@ class MinMaxSearcher : Searcher() {
         var boardStatesCount: Int = 0
     }
 
-    override fun searchBestMove(board: GameBoard, possibleMoves: Set<Int>, depth: Int, evaluator: Evaluator): Int {
+    override fun searchBestMove(board: GameBoard, ownedFieldState: FieldState, depth: Int, evaluator: Evaluator): Int {
         algorithmDepth = depth
-        val chosenMove = valueMax(board, depth, evaluator, -1)
+        val chosenMove = if (ownedFieldState === FieldState.WHITE) valueMax(board, depth, evaluator, -1) else valueMin(board, depth, evaluator, -1)
         println("       AI chose move evaluated at: ${chosenMove.first}. Move leading to this state is ${chosenMove.second}")
         boardStatesCount = 0
         return chosenMove.second
     }
 
-    // max player is always white in this implementation
+    //player whose turn is it is max player
     private fun valueMax(board: GameBoard, depth: Int, evaluator: Evaluator, firstMoveLeadingToCurrentState: Int, tab: String = ""): Pair<Float, Int> {
         var bestValue = Integer.MIN_VALUE.toFloat()
 

@@ -1,6 +1,7 @@
 package logic
 
 import logic.ai.AiPlayer
+import logic.ai.evaluation.FieldOwnershipEvaluator
 import logic.ai.evaluation.FieldWeightFocusedEvaluator
 import logic.ai.evaluation.field_weights.StandardFieldWeightProvider
 import logic.ai.searching.MinMaxSearcher
@@ -32,7 +33,7 @@ class GameManager : BoardUpdateListener, MoveCompletedCallback, FieldClickListen
     var playerTurn: PlayerTurn = PlayerTurn.BLACK
         private set
 
-    private val blackPlayer = AiPlayer(RandomSearcher(), FieldWeightFocusedEvaluator(StandardFieldWeightProvider()), 1, FieldState.BLACK, this)
+    private val blackPlayer = AiPlayer(MinMaxSearcher(), FieldOwnershipEvaluator(StandardFieldWeightProvider()), 1, FieldState.BLACK, this)
     private val whitePlayer = AiPlayer(MinMaxSearcher(), FieldWeightFocusedEvaluator(StandardFieldWeightProvider()), 5, FieldState.WHITE, this)
 
     private val board = GameBoard()
@@ -70,9 +71,10 @@ class GameManager : BoardUpdateListener, MoveCompletedCallback, FieldClickListen
 
     fun beginWhiteTurn() {
         playerTurn = PlayerTurn.WHITE
-        board.possibleMoves = board.legalMoveManager.findLegalMoves(board, FieldState.WHITE)
+        board.possibleMoves = board.legalMoveManager.findLegalMoves(board, whitePlayer.ownedFieldsType)
         board.gameState.whiteMobility = board.possibleMoves.size
         board.gameState.blackMobility = board.legalMoveManager.findLegalMoves(board, FieldState.BLACK).size
+        gameBoardPanel.showPossibleMoves(board.possibleMoves)
 
         if (board.gameState.whiteMobility != 0) {
             whitePlayer.performMove(board, board.possibleMoves)
@@ -85,17 +87,17 @@ class GameManager : BoardUpdateListener, MoveCompletedCallback, FieldClickListen
 
     fun beginBlackTurn() {
         playerTurn = PlayerTurn.BLACK
-        board.possibleMoves = board.legalMoveManager.findLegalMoves(board, FieldState.BLACK)
+        board.possibleMoves = board.legalMoveManager.findLegalMoves(board, blackPlayer.ownedFieldsType)
         board.gameState.blackMobility = board.possibleMoves.size
         board.gameState.whiteMobility = board.legalMoveManager.findLegalMoves(board, FieldState.WHITE).size
         gameBoardPanel.showPossibleMoves(board.possibleMoves)
 
-        if (board.gameState.blackMobility == 0) {
-            beginWhiteTurn()
-        } else if (board.gameState.isEndOfGame()) {
-            printEndGameState()
-        } else {
+        if (board.gameState.blackMobility != 0) {
             blackPlayer.performMove(board, board.possibleMoves)
+        } else if (board.gameState.blackMobility == 0 && !board.gameState.isEndOfGame()) {
+            beginWhiteTurn()
+        } else {
+            printEndGameState()
         }
     }
 
@@ -112,7 +114,7 @@ class GameManager : BoardUpdateListener, MoveCompletedCallback, FieldClickListen
 
         updateGameStatePanel()
 
-        if(fieldState === FieldState.BLACK) beginWhiteTurn() else beginBlackTurn()
+        if (fieldState === FieldState.BLACK) beginWhiteTurn() else beginBlackTurn()
     }
 
     private fun updateGameStatePanel() {
