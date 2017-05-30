@@ -30,9 +30,6 @@ class MinMaxSearcher : Searcher() {
 
         if(depth <= 0) {
             val currentBoardValue = evaluator.evaluate(board, FieldState.WHITE) //always evaluate from the same perspective
-//            println()
-//            board.printBoard()
-//            println("This board was evaluated for $currentBoardValue. Move leading to this state is $firstMoveLeadingToCurrentState")
             return Pair(currentBoardValue, firstMoveLeadingToCurrentState)
         }
 
@@ -90,9 +87,6 @@ class MinMaxSearcher : Searcher() {
 
         if(depth <= 0) {
             val currentBoardValue = evaluator.evaluate(board, FieldState.WHITE) //always evaluate from the same perspective
-//            println()
-//            board.printBoard()
-//            println("This board was evaluated for $currentBoardValue. Move leading to this state is $firstMoveLeadingToCurrentState")
             return Pair(currentBoardValue, firstMoveLeadingToCurrentState)
         }
         board.gameState.recalculate(board)

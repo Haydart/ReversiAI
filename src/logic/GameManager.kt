@@ -2,11 +2,13 @@ package logic
 
 import logic.ai.AiPlayer
 import logic.ai.evaluation.FieldWeightFocusedEvaluator
-import logic.ai.evaluation.field_weights.NewFieldWeightProvider
+import logic.ai.evaluation.field_weights.StandardFieldWeightProvider
 import logic.ai.searching.MinMaxSearcher
 import logic.board.FieldState
 import logic.board.GameBoard
-import ui.*
+import ui.BoardUpdateListener
+import ui.GameBoardPanel
+import ui.GameStatePanel
 import java.awt.Color
 import java.awt.Dimension
 import java.awt.EventQueue
@@ -17,19 +19,23 @@ import javax.swing.UIManager
 /**
  * Created by r.makowiecki on 12/05/2017.
  */
-class GameManager : FieldClickListener, BoardUpdateListener {
+class GameManager : BoardUpdateListener, MoveCompletedCallback {
+
     private val preferredCellSize = 80
     private val cellColor = Color(61, 168, 3)
     var playerTurn: PlayerTurn = PlayerTurn.BLACK
         private set
+
+    private val blackPlayer = HumanPlayer(this, FieldState.BLACK)
+    private val whitePlayer = AiPlayer(MinMaxSearcher(), FieldWeightFocusedEvaluator(StandardFieldWeightProvider()), 5, FieldState.WHITE, this)
+
     private val board = GameBoard()
-    private val gameBoardPanel = GameBoardPanel(cellColor, preferredCellSize, this, this)
+    private val gameBoardPanel = GameBoardPanel(cellColor, preferredCellSize, blackPlayer, this)
     private val gameStatePanel = GameStatePanel()
-    private val aiPlayer = AiPlayer(MinMaxSearcher(), FieldWeightFocusedEvaluator(NewFieldWeightProvider()), 5, FieldState.WHITE)
 
     fun startReversiGame() {
         launchGui()
-        beginUserTurn()
+        beginBlackTurn()
     }
 
     private fun launchGui() {
@@ -53,41 +59,26 @@ class GameManager : FieldClickListener, BoardUpdateListener {
     }
 
     override fun onBoardUiUpdatedAfterUserMove() {
-        beginAiTurn()
+        //beginWhiteTurn()
     }
 
-    fun beginAiTurn() {
+    fun beginWhiteTurn() {
         playerTurn = PlayerTurn.WHITE
         board.possibleMoves = board.legalMoveManager.findLegalMoves(board, FieldState.WHITE)
         board.gameState.whiteFieldsCount = board.getSquaresWithState(FieldState.WHITE).size
         board.gameState.whiteMobility = board.possibleMoves.size
         board.gameState.blackMobility = board.legalMoveManager.findLegalMoves(board, FieldState.BLACK).size
 
-        updateGameStatePanel()
-
         if (board.gameState.whiteMobility != 0) {
-            object : Thread() {
-                override fun run() {
-                    val moveFieldIndex = aiPlayer.performMove(board, board.possibleMoves)
-                    board.boardStateArray[moveFieldIndex.first].fieldState = moveFieldIndex.second
-                    gameBoardPanel.hidePossibleMoves(board.possibleMoves)
-                    board.flipFieldsAffectedByMove(board.legalMoveManager.findFieldsFlippedByMove(board, moveFieldIndex.first))
-                    board.possibleMoves = board.legalMoveManager.findLegalMoves(board, FieldState.BLACK)
-                    board.gameState.whiteFieldsCount = board.getSquaresWithState(FieldState.WHITE).size
-                    board.gameState.whiteMobility = board.possibleMoves.size
-                    gameBoardPanel.drawBoard(board)
-                    beginUserTurn()
-                    this.interrupt()
-                }
-            }.start()
+            whitePlayer.performMove(board, board.possibleMoves)
         } else if (board.gameState.whiteMobility == 0 && !board.gameState.isEndOfGame()) {
-            beginUserTurn()
+            beginBlackTurn()
         } else if (board.gameState.isEndOfGame()) {
             printEndGameState()
         }
     }
 
-    fun beginUserTurn() {
+    fun beginBlackTurn() {
         playerTurn = PlayerTurn.BLACK
         board.possibleMoves = board.legalMoveManager.findLegalMoves(board, FieldState.BLACK)
         board.gameState.blackFieldsCount = board.getSquaresWithState(FieldState.BLACK).size
@@ -95,13 +86,25 @@ class GameManager : FieldClickListener, BoardUpdateListener {
         board.gameState.whiteMobility = board.legalMoveManager.findLegalMoves(board, FieldState.WHITE).size
         gameBoardPanel.showPossibleMoves(board.possibleMoves)
 
-        updateGameStatePanel()
-
         if (board.gameState.blackMobility == 0) {
-            beginAiTurn()
+            beginWhiteTurn()
         } else if (board.gameState.isEndOfGame()) {
             printEndGameState()
+        } else {
+            blackPlayer.performMove(board, board.possibleMoves)
         }
+    }
+
+    override fun onPlayerMoved(index: Int, fieldState: FieldState) {
+        board.boardStateArray[index].fieldState = fieldState
+        gameBoardPanel.hidePossibleMoves(board.possibleMoves)
+        board.flipFieldsAffectedByMove(board.legalMoveManager.findFieldsFlippedByMove(board, index))
+        gameBoardPanel.drawBoard(board)
+        board.printBoard()
+
+        updateGameStatePanel()
+
+        if(fieldState === FieldState.BLACK) beginWhiteTurn() else beginBlackTurn()
     }
 
     private fun updateGameStatePanel() {
@@ -112,16 +115,5 @@ class GameManager : FieldClickListener, BoardUpdateListener {
         val gameResult = board.gameState.getGameResult()
         println(gameResult)
         gameStatePanel.updateState(gameStateMessage = gameResult.toString())
-    }
-
-    override fun onFieldClicked(index: Int): FieldState? {
-        if (board.possibleMoves.contains(index) && playerTurn === PlayerTurn.BLACK) {
-            board.boardStateArray[index].fieldState = FieldState.BLACK
-            gameBoardPanel.hidePossibleMoves(board.possibleMoves)
-            board.flipFieldsAffectedByMove(board.legalMoveManager.findFieldsFlippedByMove(board, index))
-            gameBoardPanel.drawBoard(board)
-            return FieldState.BLACK
-        }
-        return null
     }
 }
