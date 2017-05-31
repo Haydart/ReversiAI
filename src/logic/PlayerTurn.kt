@@ -1,19 +1,20 @@
 package logic
 
-import java.awt.Color
+import logic.board.FieldState
 
 /**
  * Created by r.makowiecki on 13/05/2017.
  */
 enum class PlayerTurn {
     BLACK {
-        override fun getFieldBackgroundColor(): Color = Color.BLACK
+        override fun getOwnedFieldState() = FieldState.BLACK
         override fun toString() = "Black turn"
     },
     WHITE {
-        override fun getFieldBackgroundColor(): Color = Color.WHITE
+        override fun getOwnedFieldState() = FieldState.WHITE
         override fun toString() = "White turn"
     };
 
-    abstract fun getFieldBackgroundColor() : Color
+    abstract fun getOwnedFieldState(): FieldState
+    fun opposite(): PlayerTurn = if (this === BLACK) WHITE else BLACK
 }

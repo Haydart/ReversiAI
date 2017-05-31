@@ -1,7 +1,7 @@
 package ui
 
-import logic.board.FieldState
 import logic.FieldTypeImageProvider
+import logic.board.FieldState
 import logic.board.GameBoard
 import java.awt.Color
 import java.awt.Point
@@ -11,7 +11,7 @@ import javax.swing.JPanel
 /**
  * Created by r.makowiecki on 12/05/2017.
  */
-class GameBoardPanel(cellColor: Color, initialCellSize: Int, fieldClickListener: FieldClickListener, private val boardUpdateListener: BoardUpdateListener) : JPanel() {
+class GameBoardPanel(cellColor: Color, initialCellSize: Int, fieldClickListener: FieldClickListener) : JPanel() {
     private val imageProvider = FieldTypeImageProvider(initialCellSize)
     private var uiCellArray = Array<UiCell?>(64, { null })
 
@@ -26,7 +26,6 @@ class GameBoardPanel(cellColor: Color, initialCellSize: Int, fieldClickListener:
                     val newFieldState = fieldClickListener.onFieldClicked(field.index)
                     if(newFieldState != null) {
                         field.fieldState = newFieldState
-                        boardUpdateListener.onBoardUiUpdatedAfterUserMove()
                     }
                 }
             })
