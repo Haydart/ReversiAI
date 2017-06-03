@@ -10,12 +10,10 @@ import logic.board.FieldState
 import logic.board.GameBoard
 import ui.FieldClickListener
 import ui.GameBoardPanel
+import ui.GameFrame
 import ui.GameStatePanel
 import java.awt.Color
-import java.awt.Dimension
 import java.awt.EventQueue
-import java.awt.FlowLayout
-import javax.swing.JFrame
 import javax.swing.UIManager
 
 /**
@@ -41,7 +39,7 @@ class GameManager : MoveCompletedCallback, FieldClickListener {
 
     fun startReversiGame() {
         launchGui()
-        beginTurn(PlayerTurn.BLACK)
+        beginTurn(playerTurn)
     }
 
     private fun launchGui() {
@@ -50,16 +48,7 @@ class GameManager : MoveCompletedCallback, FieldClickListener {
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
             } catch (ex: Exception) {
             }
-            val frame = JFrame("Reversi")
-            frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
-            frame.layout = FlowLayout()
-            frame.preferredSize = Dimension(750, 750)
-            frame.minimumSize = Dimension(700, 750)
-            frame.add(gameBoardPanel)
-            frame.add(gameStatePanel)
-            frame.pack()
-            frame.setLocationRelativeTo(null)
-            frame.isVisible = true
+            GameFrame(gameBoardPanel, gameStatePanel).isVisible = true
         }
         gameBoardPanel.drawBoard(board)
     }
