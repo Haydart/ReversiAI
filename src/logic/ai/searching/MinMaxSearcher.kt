@@ -2,22 +2,25 @@ package logic.ai.searching
 
 import logic.GameResult
 import logic.ai.evaluation.Evaluator
+import logic.ai.searching.move_ordering.IdleSearchMoveOrderer
+import logic.ai.searching.move_ordering.SearchMoveOrderer
 import logic.board.FieldState
 import logic.board.GameBoard
 
 /**
  * Created by r.makowiecki on 17/05/2017.
  */
-class MinMaxSearcher : Searcher() {
-
+class MinMaxSearcher : Searcher {
     private var algorithmDepth = 0
+    private var moveOrderer: SearchMoveOrderer = IdleSearchMoveOrderer()
 
     companion object {
         var boardStatesCount: Int = 0
     }
 
-    override fun searchBestMove(board: GameBoard, ownedFieldState: FieldState, depth: Int, evaluator: Evaluator): Int {
+    override fun searchBestMove(board: GameBoard, ownedFieldState: FieldState, depth: Int, evaluator: Evaluator, moveOrderer: SearchMoveOrderer): Int {
         algorithmDepth = depth
+        this.moveOrderer = moveOrderer
         val chosenMove = if (ownedFieldState === FieldState.WHITE) valueMax(board, depth, evaluator, -1) else valueMin(board, depth, evaluator, -1)
         println("       AI chose move evaluated at: ${chosenMove.first}. Move leading to this state is ${chosenMove.second}")
         boardStatesCount = 0
@@ -42,10 +45,10 @@ class MinMaxSearcher : Searcher() {
         var firstMoveIndex: Int
         var bestMoveIndex = -1
 
-        val whitePossibleMoves = board.legalMoveManager.findLegalMoves(board, FieldState.WHITE)
+        val possibleMoves = board.legalMoveManager.findLegalMoves(board, FieldState.WHITE)
 
-        if(whitePossibleMoves.isNotEmpty()) {
-            for (fieldIndex in whitePossibleMoves) {
+        if (possibleMoves.isNotEmpty()) {
+            for (fieldIndex in moveOrderer.getOrderedPossibleMoves(board, possibleMoves)) {
                 board.boardStateArray[fieldIndex].fieldState = FieldState.WHITE
                 val flippedFields = board.legalMoveManager.findFieldsFlippedByMove(board, fieldIndex)
                 board.flipFieldsAffectedByMove(flippedFields)
@@ -63,7 +66,7 @@ class MinMaxSearcher : Searcher() {
         } else {
             val opponentPossibleMoves = board.legalMoveManager.findLegalMoves(board, FieldState.BLACK)
 
-            for (fieldIndex in opponentPossibleMoves) {
+            for (fieldIndex in moveOrderer.getOrderedPossibleMoves(board, opponentPossibleMoves)) {
                 board.boardStateArray[fieldIndex].fieldState = FieldState.BLACK
                 val flippedFields = board.legalMoveManager.findFieldsFlippedByMove(board, fieldIndex)
                 board.flipFieldsAffectedByMove(flippedFields)
@@ -98,10 +101,10 @@ class MinMaxSearcher : Searcher() {
         var firstMoveIndex : Int
         var bestMoveIndex = -1
 
-        val blackPossibleMoves = board.legalMoveManager.findLegalMoves(board, FieldState.BLACK)
+        val possibleMoves = board.legalMoveManager.findLegalMoves(board, FieldState.BLACK)
 
-        if(blackPossibleMoves.isNotEmpty()) {
-            for (fieldIndex in blackPossibleMoves) {
+        if (possibleMoves.isNotEmpty()) {
+            for (fieldIndex in moveOrderer.getOrderedPossibleMoves(board, possibleMoves)) {
                 board.boardStateArray[fieldIndex].fieldState = FieldState.BLACK
                 val flippedFields = board.legalMoveManager.findFieldsFlippedByMove(board, fieldIndex)
                 board.flipFieldsAffectedByMove(flippedFields)
@@ -116,9 +119,9 @@ class MinMaxSearcher : Searcher() {
                 }
             }
         } else {
-            val whitePossibleMoves = board.legalMoveManager.findLegalMoves(board, FieldState.WHITE)
+            val opponentPossibleMoves = board.legalMoveManager.findLegalMoves(board, FieldState.WHITE)
 
-            for (fieldIndex in whitePossibleMoves) {
+            for (fieldIndex in moveOrderer.getOrderedPossibleMoves(board, opponentPossibleMoves)) {
                 board.boardStateArray[fieldIndex].fieldState = FieldState.WHITE
                 val flippedFields = board.legalMoveManager.findFieldsFlippedByMove(board, fieldIndex)
                 board.flipFieldsAffectedByMove(flippedFields)
