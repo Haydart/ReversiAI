@@ -16,8 +16,8 @@ class HumanPlayer(callback: MoveCompletedCallback, ownedFieldsType: FieldState) 
 
     override fun onFieldClicked(index: Int): FieldState? {
         if (possibleMoves.contains(index)) { //add turn check somehow
-            moveCompletedCallback.onPlayerMoved(index, ownedFieldsType)
-            return ownedFieldsType
+            callback.onPlayerMoved(index, ownedFieldState)
+            return ownedFieldState
         }
         return null
     }

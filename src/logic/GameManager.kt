@@ -27,18 +27,19 @@ class GameManager : MoveCompletedCallback, FieldClickListener {
 
     private val preferredCellSize = 80
     private val cellColor = Color(61, 168, 3)
-    var playerTurn: PlayerTurn = PlayerTurn.BLACK
-        private set
+    private val isGuiModeEnabled = false
+    private var playerTurn: PlayerTurn = PlayerTurn.BLACK
 
-    private val blackPlayer = AiPlayer(MinMaxSearcher(), CornerFocusedCombinedEvaluator(NewFieldWeightProvider()), 5, FieldState.BLACK, this)
-    private val whitePlayer = AiPlayer(MinMaxSearcher(), MobilityRestrictingCombinedEvaluator(StandardFieldWeightProvider()), 5, FieldState.WHITE, this)
+    private val blackPlayer = AiPlayer(MinMaxSearcher(), CornerFocusedCombinedEvaluator(NewFieldWeightProvider()), 5, FieldState.BLACK, isGuiModeEnabled, this)
+    private val whitePlayer = AiPlayer(MinMaxSearcher(), MobilityRestrictingCombinedEvaluator(StandardFieldWeightProvider()), 5, FieldState.WHITE, isGuiModeEnabled, this)
 
     private val board = GameBoard()
     private val gameBoardPanel = GameBoardPanel(cellColor, preferredCellSize, this)
     private val gameStatePanel = GameStatePanel()
 
     fun startReversiGame() {
-        launchGui()
+        if (isGuiModeEnabled)
+            launchGui()
         beginTurn(playerTurn)
     }
 
