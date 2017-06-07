@@ -5,6 +5,7 @@ import logic.ai.evaluation.CornerFocusedCombinedEvaluator
 import logic.ai.evaluation.MobilityRestrictingCombinedEvaluator
 import logic.ai.evaluation.field_weights.NewFieldWeightProvider
 import logic.ai.evaluation.field_weights.StandardFieldWeightProvider
+import logic.ai.searching.AlphaBetaPruningSearcherStack
 import logic.ai.searching.MinMaxSearcher
 import logic.board.FieldState
 import logic.board.GameBoard
@@ -27,11 +28,14 @@ class GameManager : MoveCompletedCallback, FieldClickListener {
 
     private val preferredCellSize = 80
     private val cellColor = Color(61, 168, 3)
-    private val isGuiModeEnabled = false
+    private val isGuiModeEnabled = true
     private var playerTurn: PlayerTurn = PlayerTurn.BLACK
 
-    private val blackPlayer = AiPlayer(MinMaxSearcher(), CornerFocusedCombinedEvaluator(NewFieldWeightProvider()), 5, FieldState.BLACK, isGuiModeEnabled, this)
-    private val whitePlayer = AiPlayer(MinMaxSearcher(), MobilityRestrictingCombinedEvaluator(StandardFieldWeightProvider()), 5, FieldState.WHITE, isGuiModeEnabled, this)
+    private val blackPlayer = AiPlayer(MinMaxSearcher(), CornerFocusedCombinedEvaluator(NewFieldWeightProvider()), 2, FieldState.BLACK, isGuiModeEnabled, this)
+//    private val whitePlayer = AiPlayer(MinMaxSearcher(), MobilityRestrictingCombinedEvaluator(StandardFieldWeightProvider()), 4, FieldState.WHITE, isGuiModeEnabled, this)
+
+    //    private val blackPlayer = HumanPlayer(this, FieldState.BLACK)
+    private val whitePlayer = AiPlayer(AlphaBetaPruningSearcherStack(), MobilityRestrictingCombinedEvaluator(StandardFieldWeightProvider()), 6, FieldState.WHITE, isGuiModeEnabled, this)
 
     private val board = GameBoard()
     private val gameBoardPanel = GameBoardPanel(cellColor, preferredCellSize, this)
