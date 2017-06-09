@@ -18,6 +18,8 @@ class AlphaBetaPruningSearcherStack : Searcher {
     private val initialAlpha = Float.MIN_VALUE
     private val initialBeta = Float.MAX_VALUE
 
+    private var prunesCount = 0
+
     override fun searchBestMove(board: GameBoard, ownedFieldState: FieldState, depth: Int, evaluator: Evaluator, moveOrderer: SearchMoveOrderer): Int {
         algorithmDepth = depth
         this.moveOrderer = moveOrderer
@@ -29,36 +31,37 @@ class AlphaBetaPruningSearcherStack : Searcher {
 
         //the player to make the move is always MAX player
         val possibleMoves = board.legalMoveManager.findLegalMoves(board, ownedFieldState)
-        for (possibleMove in moveOrderer.getOrderedPossibleMoves(board, possibleMoves, ownedFieldState)) {
+        for (possibleMove in moveOrderer.getOrderedPossibleMoves(board, possibleMoves)) {
             //max player outer recursive loop to be able to determine best move
 
             //make move
-            board.boardStateArray[possibleMove].fieldState = ownedFieldState
-            val flippedFields = board.legalMoveManager.findFieldsFlippedByMove(board, possibleMove)
-            board.flipFieldsAffectedByMove(flippedFields)
+            val flippedFields = makeMove(board, possibleMove, ownedFieldState)
 
-            val alpha = miniMax(board, ownedFieldState.opposite(), depth - 1, bestScore, Float.MAX_VALUE)
+            val alpha = alphaBeta(board, ownedFieldState.opposite(), depth - 1, bestScore, Float.MAX_VALUE)
+//            println("Checking possible move to $possibleMove worth $alpha")
 
             //undo move
-            board.flipFieldsAffectedByMove(flippedFields)
-            board.boardStateArray[possibleMove].fieldState = FieldState.EMPTY
+            undoMove(board, flippedFields, possibleMove)
 
             if (alpha > bestScore || bestMove == -1) {
                 bestMove = possibleMove
                 bestScore = alpha
             }
         }
-        println("    AI chose move to position $bestMove with value of $bestScore")
+        println("$prunesCount")
+        prunesCount = 0
         return bestMove
     }
 
     @Suppress("NAME_SHADOWING")
-    private fun miniMax(board: GameBoard, ownedFieldState: FieldState, depth: Int, alpha: Float, beta: Float): Float {
+    private fun alphaBeta(board: GameBoard, ownedFieldState: FieldState, depth: Int, alpha: Float, beta: Float): Float {
         var alpha = alpha
         var beta = beta
 
         if (depth <= 0) {
             val currentBoardValue = evaluator.evaluate(board, FieldState.WHITE) //always evaluate from the same perspective
+//            board.printBoard()
+//            println("This board was evaluated for $currentBoardValue")
             return currentBoardValue
         }
         board.gameState.recalculate(board)
@@ -71,51 +74,49 @@ class AlphaBetaPruningSearcherStack : Searcher {
 
         if (ownedFieldState === playerOwnedFieldState) {
 
-            var currentAlpha = Float.MIN_VALUE
-
-            for (possibleMove in moveOrderer.getOrderedPossibleMoves(board, possibleMoves, ownedFieldState)) {
-
+            for (possibleMove in moveOrderer.getOrderedPossibleMoves(board, possibleMoves)) {
                 //make move
-                board.boardStateArray[possibleMove].fieldState = ownedFieldState
-                val flippedFields = board.legalMoveManager.findFieldsFlippedByMove(board, possibleMove)
-                board.flipFieldsAffectedByMove(flippedFields)
+                val flippedFields = makeMove(board, possibleMove, ownedFieldState)
 
-                currentAlpha = Math.max(currentAlpha, miniMax(board, ownedFieldState.opposite(), depth - 1, alpha, beta))
-                alpha = Math.max(alpha, currentAlpha)
+                alpha = Math.max(alpha, alphaBeta(board, ownedFieldState.opposite(), depth - 1, alpha, beta))
 
                 //undo move
-                board.flipFieldsAffectedByMove(flippedFields)
-                board.boardStateArray[possibleMove].fieldState = FieldState.EMPTY
+                undoMove(board, flippedFields, possibleMove)
 
                 if (alpha >= beta) {
-                    println("Alpha cut performed")
+                    prunesCount++
                     return alpha
                 }
             }
-            return currentAlpha
+            return alpha
         }
 
-        var currentBeta = Float.MAX_VALUE
-
-        for (possibleMove in moveOrderer.getOrderedPossibleMoves(board, possibleMoves, ownedFieldState)) {
-
+        for (possibleMove in moveOrderer.getOrderedPossibleMoves(board, possibleMoves)) {
             //make move
-            board.boardStateArray[possibleMove].fieldState = ownedFieldState
-            val flippedFields = board.legalMoveManager.findFieldsFlippedByMove(board, possibleMove)
-            board.flipFieldsAffectedByMove(flippedFields)
+            val flippedFields = makeMove(board, possibleMove, ownedFieldState)
 
-            currentBeta = Math.min(currentBeta, miniMax(board, ownedFieldState.opposite(), depth - 1, alpha, beta))
-            beta = Math.min(beta, currentBeta)
+            beta = Math.min(beta, alphaBeta(board, ownedFieldState.opposite(), depth - 1, alpha, beta))
 
             //undo move
-            board.flipFieldsAffectedByMove(flippedFields)
-            board.boardStateArray[possibleMove].fieldState = FieldState.EMPTY
+            undoMove(board, flippedFields, possibleMove)
 
-            if (beta <= alpha) {
-                println("Beta cut performed")
+            if (alpha >= beta) {
+                prunesCount++
                 return beta
             }
         }
-        return currentBeta
+        return beta
+    }
+
+    private fun makeMove(board: GameBoard, performedMove: Int, ownedFieldState: FieldState): Set<Int> {
+        board.boardStateArray[performedMove].fieldState = ownedFieldState
+        val flippedFields = board.legalMoveManager.findFieldsFlippedByMove(board, performedMove)
+        board.flipFieldsAffectedByMove(flippedFields)
+        return flippedFields
+    }
+
+    private fun undoMove(board: GameBoard, flippedFields: Set<Int>, performedMove: Int) {
+        board.flipFieldsAffectedByMove(flippedFields)
+        board.boardStateArray[performedMove].fieldState = FieldState.EMPTY
     }
 }

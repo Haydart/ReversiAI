@@ -5,14 +5,21 @@ package logic.board
  */
 class BoardField {
     var fieldState: FieldState = FieldState.EMPTY
-    val index: Int
-    val coordinates: java.awt.Point
+    var index: Int
+    var coordinates: java.awt.Point
 
     init {
         coordinates = java.awt.Point(objectsCount % 8, objectsCount / 8)
         index = logic.board.BoardField.Companion.objectsCount
         logic.board.BoardField.Companion.objectsCount++
-//        //println("$coordinates, $objectsCount")
+    }
+
+    fun getCopy(): BoardField {
+        val copy = BoardField()
+        copy.index = this.index
+        copy.coordinates = this.coordinates
+        copy.fieldState = this.fieldState
+        return copy
     }
 
     companion object {

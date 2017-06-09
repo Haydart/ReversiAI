@@ -2,11 +2,12 @@ package logic
 
 import logic.ai.AiPlayer
 import logic.ai.evaluation.CornerFocusedCombinedEvaluator
-import logic.ai.evaluation.MobilityRestrictingCombinedEvaluator
+import logic.ai.evaluation.FieldOwnershipEvaluator
 import logic.ai.evaluation.field_weights.NewFieldWeightProvider
 import logic.ai.evaluation.field_weights.StandardFieldWeightProvider
 import logic.ai.searching.AlphaBetaPruningSearcherStack
 import logic.ai.searching.MinMaxSearcher
+import logic.ai.searching.move_ordering.PresumedEvaluationAscOrderer
 import logic.board.FieldState
 import logic.board.GameBoard
 import ui.FieldClickListener
@@ -31,11 +32,15 @@ class GameManager : MoveCompletedCallback, FieldClickListener {
     private val isGuiModeEnabled = true
     private var playerTurn: PlayerTurn = PlayerTurn.BLACK
 
-    private val blackPlayer = AiPlayer(MinMaxSearcher(), CornerFocusedCombinedEvaluator(NewFieldWeightProvider()), 2, FieldState.BLACK, isGuiModeEnabled, this)
-//    private val whitePlayer = AiPlayer(MinMaxSearcher(), MobilityRestrictingCombinedEvaluator(StandardFieldWeightProvider()), 4, FieldState.WHITE, isGuiModeEnabled, this)
+    //    private val whitePlayer = AiPlayer(MinMaxSearcher(), MobilityRestrictingCombinedEvaluator(StandardFieldWeightProvider()), 4, FieldState.WHITE, isGuiModeEnabled, this)
 
-    //    private val blackPlayer = HumanPlayer(this, FieldState.BLACK)
-    private val whitePlayer = AiPlayer(AlphaBetaPruningSearcherStack(), MobilityRestrictingCombinedEvaluator(StandardFieldWeightProvider()), 6, FieldState.WHITE, isGuiModeEnabled, this)
+//        private val blackPlayer = HumanPlayer(this, FieldState.BLACK)
+
+    private val blackPlayer = AiPlayer(MinMaxSearcher(), CornerFocusedCombinedEvaluator(StandardFieldWeightProvider()),
+            4, FieldState.BLACK, isGuiModeEnabled, this)
+
+    private val whitePlayer = AiPlayer(AlphaBetaPruningSearcherStack(), FieldOwnershipEvaluator(NewFieldWeightProvider()),
+            7, FieldState.WHITE, isGuiModeEnabled, this, PresumedEvaluationAscOrderer(FieldOwnershipEvaluator(NewFieldWeightProvider())))
 
     private val board = GameBoard()
     private val gameBoardPanel = GameBoardPanel(cellColor, preferredCellSize, this)

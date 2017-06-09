@@ -11,6 +11,15 @@ class GameState {
     var blackMobility: Int = 4
     var whiteMobility: Int = 0
 
+    fun getCopy(): GameState {
+        val copy = GameState()
+        copy.blackFieldsCount = this.blackFieldsCount
+        copy.whiteFieldsCount = this.whiteFieldsCount
+        copy.blackMobility = this.blackMobility
+        copy.whiteMobility = this.whiteMobility
+        return copy
+    }
+
     fun isEndOfGame() = blackFieldsCount + whiteFieldsCount == 64
             || blackFieldsCount == 0 || whiteFieldsCount == 0
             || (blackMobility == 0 && whiteMobility == 0)

@@ -19,7 +19,7 @@ class AlphaBetaPruningSearcher : Searcher {
         algorithmDepth = depth
         this.moveOrderer = moveOrderer
         val chosenMove = if (ownedFieldState === FieldState.WHITE) valueMax(board, depth, initialAlpha, initialBeta, evaluator, -1) else valueMin(board, depth, initialAlpha, initialBeta, evaluator, -1)
-        println("       $ownedFieldState AI chose move evaluated at: ${chosenMove.first}. Move leading to this state is ${chosenMove.second}")
+//        println("       $ownedFieldState AI chose move evaluated at: ${chosenMove.first}. Move leading to this state is ${chosenMove.second}")
         MinMaxSearcher.boardStatesCount = 0
         return chosenMove.second
     }
@@ -50,7 +50,7 @@ class AlphaBetaPruningSearcher : Searcher {
         var potentialBestValue: Pair<Float, Int> = Pair(Float.MIN_VALUE, -1)
 
         if (possibleMoves.isNotEmpty()) {
-            for (fieldIndex in moveOrderer.getOrderedPossibleMoves(board, possibleMoves, FieldState.WHITE)) {
+            for (fieldIndex in moveOrderer.getOrderedPossibleMoves(board, possibleMoves)) {
                 board.boardStateArray[fieldIndex].fieldState = FieldState.WHITE
                 val flippedFields = board.legalMoveManager.findFieldsFlippedByMove(board, fieldIndex)
                 board.flipFieldsAffectedByMove(flippedFields)
@@ -99,7 +99,7 @@ class AlphaBetaPruningSearcher : Searcher {
         var potentialBestValue: Pair<Float, Int> = Pair(Float.MAX_VALUE, -1)
 
         if (possibleMoves.isNotEmpty()) {
-            for (fieldIndex in moveOrderer.getOrderedPossibleMoves(board, possibleMoves, FieldState.BLACK)) {
+            for (fieldIndex in moveOrderer.getOrderedPossibleMoves(board, possibleMoves)) {
                 board.boardStateArray[fieldIndex].fieldState = FieldState.BLACK
                 val flippedFields = board.legalMoveManager.findFieldsFlippedByMove(board, fieldIndex)
                 board.flipFieldsAffectedByMove(flippedFields)

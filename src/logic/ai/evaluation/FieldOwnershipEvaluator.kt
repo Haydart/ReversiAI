@@ -10,7 +10,7 @@ import logic.board.GameBoard
 class FieldOwnershipEvaluator(fieldValueWeights: FieldWeightProvider) : Evaluator {
     val fieldWeights = fieldValueWeights.getFieldWeights()
 
-    private val POSESSION_FACTOR: Float = 0f
+    private val POSESSION_FACTOR: Float = 1f
 
     override fun evaluate(board: GameBoard, ownedFieldsType: FieldState): Float {
         val possessedFieldsIndicesArray = board.boardStateArray.filter { it.fieldState === ownedFieldsType }
